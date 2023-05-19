@@ -1,3 +1,12 @@
+//const geolib = require('geolib');
+
+document.getElementById("search-button").addEventListener("click", (event) => {
+    let inputElement = document.getElementById("user-query")
+    let outputElement = document.getElementById("search-result")
+    outputElement.innerHTML = handleSearch(inputElement.value)
+});
+
+
 function searchButtonPressed() {
 
     let inputElement = document.getElementById("user-query")
@@ -24,5 +33,6 @@ function constructPrompt(context, query) {
 }
 
 function callBackend(prompt) {
-    return "Your query was: " + prompt
+    // geolib.convertDistance(3, "mm".toString())
+    return `Your query was: ${prompt}` 
 }
