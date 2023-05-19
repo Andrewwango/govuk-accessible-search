@@ -1,0 +1,27 @@
+{
+  "name": "component",
+  "version": "1.0.0",
+  "description": "GDS accessible search component",
+  "repository": "https://github.com/Andrewwango/gds-accessible-search",
+  "author": "Andrew Wang",
+  "license": "MIT",
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "gh-pages": "^5.0.0",
+    "govuk-frontend": "^4.6.0",
+    "parcel": "^2.8.3",
+    "sass": "^1.62.1",
+    "typescript": "^5.0.4"
+  },
+  "files": [
+    "src/"
+  ],
+  "scripts": {
+    "start": "parcel serve src/index.html",
+    "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.8.3"
+  }
+}
