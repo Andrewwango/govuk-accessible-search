@@ -6,22 +6,20 @@
   "author": "Andrew Wang",
   "license": "MIT",
   "dependencies": {
-    "cross-env": "^7.0.3",
-    "gh-pages": "^5.0.0",
     "govuk-frontend": "^4.6.0",
-    "parcel": "^2.8.3",
-    "sass": "^1.62.1",
-    "typescript": "^5.0.4"
+    "live-server": "1.2.1",
+    "sass": "^1.62.1"
   },
   "files": [
     "src/"
   ],
   "scripts": {
-    "start": "parcel serve src/index.html",
-    "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
-    "deploy": "gh-pages -d dist"
+    "test": "live-server dist",
+    "build": "zsh build.sh"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "2.8.3"
+    "@parcel/transformer-sass": "2.8.3",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1"
   }
 }
