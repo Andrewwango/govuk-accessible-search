@@ -33,13 +33,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     response = action_mapping[action](request_json)
 
     return func.HttpResponse(
-        response.json(),
+        response,
         status_code=200,
         headers={"Content-Type": "application/json"},
     )
 
 
-def query_chatgpt(parameters: dict):
+def query_chatgpt(parameters: dict) -> dict:
     prompt = parameters["input"]
 
     chat_completion = openai.ChatCompletion.create(
@@ -49,4 +49,9 @@ def query_chatgpt(parameters: dict):
     )
 
     output = chat_completion.choices[0].message.content
-    return output
+
+    response = {
+        "output": output
+    }
+
+    return response
