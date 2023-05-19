@@ -30,16 +30,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except ValueError as e:
         return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
 
-    response = action_mapping[action](request_json)
-
-    return func.HttpResponse(
-        response,
-        status_code=200,
-        headers={"Content-Type": "application/json"},
-    )
+    return action_mapping[action](request_json)
 
 
-def query_chatgpt(parameters: dict) -> dict:
+def query_chatgpt(parameters: dict) -> func.HttpResponse:
     prompt = parameters["input"]
 
     chat_completion = openai.ChatCompletion.create(
@@ -54,4 +48,8 @@ def query_chatgpt(parameters: dict) -> dict:
         "output": output
     }
 
-    return response
+    return func.HttpResponse(
+        response,
+        status_code=200,
+        headers={"Content-Type": "application/json"},
+    )
