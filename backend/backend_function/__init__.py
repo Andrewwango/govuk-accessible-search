@@ -34,6 +34,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
+    # TODO: support history?
     prompt = parameters["input"]
 
     # TODO: this is very approximate
