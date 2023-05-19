@@ -36,6 +36,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
     prompt = parameters["input"]
 
+    # TODO: this is very approximate
+    if len(prompt) > 5000:
+        logging.warning("Prompt too long, truncating")
+        prompt = prompt[-5000:]
+
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
