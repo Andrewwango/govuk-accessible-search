@@ -1,3 +1,6 @@
+// Test webpack bundling by installing an example library such as 
+// geolib (`yarn add geolib`), importing it and using it in a function
+// (see callBackend). Webpack will copy geolib code into the dist js file.
 //const geolib = require('geolib');
 
 document.getElementById("search-button").addEventListener("click", (event) => {
@@ -33,6 +36,7 @@ function constructPrompt(context, query) {
 }
 
 function callBackend(prompt) {
+    // Uncomment to see webpack bundling in action
     // geolib.convertDistance(3, "mm".toString())
     return `Your query was: ${prompt}` 
 }
