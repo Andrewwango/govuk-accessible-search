@@ -5,6 +5,10 @@ Kainos OpenAI submission for SHWAST (Beenita Shah, Oliver Stanley, Andrew Wang).
 
 ## Demo
 
+A demo of the component in action on a sample GOV.UK website can be viewed here: https://andrewwango.github.io/gds-accessible-search/demo/www.gov.uk/foreign-travel-advice/france/entry-requirements.html
+
+### Get started
+
 GOV.UK websites can be downloaded using `wget`. Here is an example using the website describing [France foreign travel advice](https://www.gov.uk/foreign-travel-advice/france/entry-requirements):
 
 ```bash
