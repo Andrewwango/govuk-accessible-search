@@ -6,4 +6,7 @@ module.exports = {
   output: {
     filename: 'main.js',
   },
+  optimization: {
+    minimize: true
+  }
 };
