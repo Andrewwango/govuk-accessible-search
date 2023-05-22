@@ -40,3 +40,14 @@ Note that the CSS file is only needed to import styles for the Government Design
 
 #### Build
 This uses a custom build process in `component/build.sh`. First the Javascript, along with its dependencies, is bundled into a single script using `webpack`. Then HTML (and CSS) are copied across. Finally, all Javascripts are copied into the HTML as inline scripts (very hacky), allowing the component to be embedded in one line.
+## Demo
+
+A demo of the component in action on a sample GOV.UK website can be viewed here: https://andrewwango.github.io/gds-accessible-search/demo/www.gov.uk/foreign-travel-advice/france/entry-requirements.html
+
+### Get started
+
+GOV.UK websites can be downloaded using `wget`. Here is an example using the website describing [France foreign travel advice](https://www.gov.uk/foreign-travel-advice/france/entry-requirements):
+
+```bash
+wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france/entry-requirements
+```
