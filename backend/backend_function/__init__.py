@@ -47,7 +47,7 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
 
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
-        model="gpt-3.5-turbo",
+        model=parameters.get("model", "gpt-3.5-turbo"),
         messages=[{"role": "user", "content": prompt}]
     )
 
@@ -75,7 +75,7 @@ def query_gpt(parameters: dict) -> func.HttpResponse:
     completion = openai.Completion.create(
         prompt=prompt,
         deployment_id=OPENAI_GPT_DEPLOYMENT,
-        model="text-davinci-003",
+        model=parameters.get("model", "text-davinci-003"),
         temperature=parameters.get("temperature", 0.1),  # low temp seems good for this sort of task
     )
 
