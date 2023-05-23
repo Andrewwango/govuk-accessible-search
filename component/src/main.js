@@ -1,5 +1,7 @@
 const htmlToText = require('html-to-text');
 
+let scrapedText = ""
+
 document.getElementById("search-button").addEventListener("click", (event) => {
     let inputElement = document.getElementById("user-query")
     let outputElement = document.getElementById("search-result")
@@ -7,9 +9,9 @@ document.getElementById("search-button").addEventListener("click", (event) => {
 });
 
 function handleSearch(query) {
-    let documentText = scrapeCurrentPage()
-    let prompt = constructPrompt(documentText, query)
-    let response = callBackend(prompt) //may need to be asynchronous
+    scrapedText = (scrapedText == "") ? scrapeCurrentPage() : scrapedText
+    const prompt = constructPrompt(scrapedText, query)
+    const response = callBackend(prompt) //may need to be asynchronous
     return response
 }
 
