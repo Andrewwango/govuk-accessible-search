@@ -11,6 +11,7 @@ openai.api_base = os.getenv("OPENAI_API_URL")
 openai.api_version = "2023-05-15"
 
 OPENAI_CHATGPT_DEPLOYMENT = os.getenv("OPENAI_CHATGPT_DEPLOYMENT")
+OPENAI_GPT_DEPLOYMENT = os.getenv("OPENAI_GPT_DEPLOYMENT")
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -49,6 +50,34 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
     )
 
     output = chat_completion.choices[0].message.content
+
+    response = {
+        "output": output
+    }
+
+    return func.HttpResponse(
+        response,
+        status_code=200,
+        headers={"Content-Type": "application/json"},
+    )
+
+
+def query_gpt(parameters: dict) -> func.HttpResponse:
+    prompt = parameters["input"]
+
+    # TODO: this is very approximate
+    if len(prompt) > 5000:
+        logging.warning("Prompt too long, truncating")
+        prompt = prompt[-5000:]
+
+    completion = openai.Completion.create(
+        prompt=prompt,
+        deployment_id=OPENAI_GPT_DEPLOYMENT,
+        model="text-davinci-003",
+        temperature=parameters.get("temperature", 0.1),  # low temp seems good for this sort of task
+    )
+
+    output = completion["choices"][0]["text"].strip()
 
     response = {
         "output": output
