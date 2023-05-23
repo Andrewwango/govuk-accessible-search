@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from typing import Callable
@@ -18,7 +19,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Python HTTP trigger function processed a request")
 
     action_mapping: dict[str, Callable] = {
-        "chatgpt": query_chatgpt
+        "chatgpt": query_chatgpt,
+        "gpt": query_gpt,
     }
 
     action = req.route_params.get("action")
@@ -56,7 +58,7 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
     }
 
     return func.HttpResponse(
-        response,
+        json.dumps(response),
         status_code=200,
         headers={"Content-Type": "application/json"},
     )
@@ -84,7 +86,7 @@ def query_gpt(parameters: dict) -> func.HttpResponse:
     }
 
     return func.HttpResponse(
-        response,
+        json.dumps(response),
         status_code=200,
         headers={"Content-Type": "application/json"},
     )
