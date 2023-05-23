@@ -17,7 +17,7 @@ These questions could be for example:
 
 ### Solution
 
-Our solution consists of 3 parts:
+We have built a tool that can answer natural-language questions on any government webpage. Our solution consists of 3 parts:
 
 1. [Frontend component contained in one file](https://andrewwango.github.io/gds-accessible-search/component/dist/index.html) which performs all the logic client-side.
 2. A very simple backend to call the OpenAI API. This is deployed serverlessly
@@ -27,6 +27,7 @@ Our solution will provide the following functionality:
 
 - Drop-in: insert the component into any webpage with only one HTML tag; the component is one file to be saved on server
 - Lightweight: all processing is done client-side and the backend contains no program logic
+- Multilingual: ask a question and receive an answer in any language, using ChatGPT's multilingual capabilities
 
 ## Demo
 
