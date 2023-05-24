@@ -5,6 +5,7 @@ let scrapedText = ""
 document.getElementById("search-button").addEventListener("click", (event) => {
     let inputElement = document.getElementById("user-query")
     let outputElement = document.getElementById("search-result")
+    document.getElementById("search-result").style.display = "block"
     outputElement.innerHTML = handleSearch(inputElement.value)
 });
 
