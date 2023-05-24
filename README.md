@@ -15,6 +15,41 @@ GOV.UK websites can be downloaded using `wget`. Here is an example using the web
 wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france/entry-requirements
 ```
 
+## Backend
+
+We use a micro-backend to route API calls to an OpenAI API securely, without exposing our OpenAI API key to the frontend.
+
+### Deployment
+
+**To Deploy Locally**
+
+Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
+
+```
+cd backend
+pip install -r requirements.txt
+func start
+```
+
+**To Deploy to Azure**
+
+```
+cd backend
+func azure functionapp publish shwast-fun-app
+```
+
+(if using a different function app, replace `shwast-fun-app` with the new name)
+
+### Testing
+
+Use the text client.
+
+```
+cd text-client
+pip install -r requirements.txt
+python main.py
+```
+
 ## Component
 
 ### Usage
