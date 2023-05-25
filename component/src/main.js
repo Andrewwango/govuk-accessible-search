@@ -2,17 +2,17 @@ const htmlToText = require('html-to-text');
 
 let scrapedText = ""
 
-document.getElementById("search-button").addEventListener("click", (event) => {
+document.getElementById("search-button").addEventListener("click", async (event) => {
     let inputElement = document.getElementById("user-query")
     let outputElement = document.getElementById("search-result")
     document.getElementById("search-result").style.display = "block"
-    outputElement.innerHTML = handleSearch(inputElement.value)
+    outputElement.innerHTML = await handleSearch(inputElement.value)
 });
 
-function handleSearch(query) {
+async function handleSearch(query) {
     scrapedText = (scrapedText == "") ? scrapeCurrentPage() : scrapedText
     const prompt = constructPrompt(scrapedText, query)
-    const response = callBackend(prompt) //may need to be asynchronous
+    const response = await callBackend(prompt)
     return response
 }
 
@@ -41,7 +41,22 @@ function constructPrompt(context, query) {
     return prompt
 }
 
-function callBackend(prompt) {
-    console.log(prompt)
-    return `See console for prompt to be sent to backend` 
+async function callBackend(prompt) {
+    BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api/chatgpt"
+
+    const response = await fetch(BACKEND_URL, {
+        method: 'post',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+            "input": prompt
+        })
+    });
+
+    const responseJson = await response.json();
+    const output = responseJson["output"]
+    console.log(`Prompt: ${prompt}`)
+    console.log(`Output: ${output}`)
+    return output
 }
