@@ -51,8 +51,12 @@ RESPONSE: """
 
 
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
+    query = parameters["query"]
+    if len(query) > 200:
+        query = query[-200:]
+
     # TODO: support history?
-    prompt = construct_prompt(parameters["context"], parameters["query"])
+    prompt = construct_prompt(parameters["context"], query)
 
     # TODO: this is very approximate
     if len(prompt) > 5000:
@@ -80,7 +84,11 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
 
 
 def query_gpt(parameters: dict) -> func.HttpResponse:
-    prompt = construct_prompt(parameters["context"], parameters["query"])
+    query = parameters["query"]
+    if len(query) > 200:
+        query = query[-200:]
+
+    prompt = construct_prompt(parameters["context"], query)
 
     # TODO: this is very approximate
     if len(prompt) > 5000:
