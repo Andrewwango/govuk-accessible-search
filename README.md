@@ -5,7 +5,7 @@ Kainos OpenAI submission for SHWAST (Beenita Shah, Oliver Stanley, Andrew Wang).
 
 ### Motivation
 
-> The future of accessibility for goverment messaging
+> The future of accessibility for government messaging
 
 People for whom English is a foreign language (EFL) often need to read and understand important information and advice from GOV.UK and NHS websites, for example travel advice or public health advice. This includes those who may not even speak English at all.
 
