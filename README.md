@@ -20,8 +20,8 @@ These questions could be for example:
 We have built a tool that can answer natural-language questions on any government webpage. Our solution consists of 3 parts:
 
 1. [Frontend component contained in one file](https://andrewwango.github.io/gds-accessible-search/component/dist/index.html) which performs all the logic client-side.
-2. A very simple backend to call the OpenAI API. This is deployed serverlessly
-3. Demo of a government website with the component embedded using one line of HTML, deployed statically to Github Pages
+2. We use a micro-backend to route API calls to an OpenAI API securely, without exposing our OpenAI API key to the frontend. This is deployed serverlessly.
+3. Demo of a government website with the component inserted using Nunjucks, deployed statically to Github Pages
 
 Our solution will provide the following functionality:
 
@@ -43,7 +43,7 @@ at the desired location. Then build your website how you normally would. This em
 
 A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html).
 
-## Development
+## Developer guide
 
 ### Add component to demo
 
@@ -72,3 +72,34 @@ Note that the CSS file is only needed to import styles for the Government Design
 
 #### Build
 This uses a custom build process in `component/build.sh`. First the Javascript, along with its dependencies, is bundled into a single script using `webpack`. Then HTML (and CSS) are copied across. Finally, all Javascripts are copied into the HTML as inline scripts (very hacky), allowing the component to be embedded in one line.
+
+### Deploy backend
+
+**To Deploy Locally**
+
+Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
+
+```
+cd backend
+pip install -r requirements.txt
+func start
+```
+
+**To Deploy to Azure**
+
+```
+cd backend
+func azure functionapp publish shwast-fun-app
+```
+
+(if using a different function app, replace `shwast-fun-app` with the new name)
+
+### Test backend
+
+Use the text client.
+
+```
+cd text-client
+pip install -r requirements.txt
+python main.py
+```

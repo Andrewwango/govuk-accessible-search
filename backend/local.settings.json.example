@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "",
+    "OPENAI_API_KEY": "...",
+    "OPENAI_API_URL": "...",
+    "OPENAI_CHATGPT_DEPLOYMENT": "...",
+    "OPENAI_GPT_DEPLOYMENT": "..."
+  }
+}
