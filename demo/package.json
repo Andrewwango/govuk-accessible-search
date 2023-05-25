@@ -1,0 +1,18 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "Demo government website",
+  "license": "MIT",
+  "dependencies": {
+    "live-server": "1.2.1",
+    "nunjucks": "^3.2.4",
+    "nunjucks-to-html": "^1.1.0"
+  },
+  "scripts": {
+    "test": "live-server dist",
+    "install-component": "mkdir -p component && curl https://raw.githubusercontent.com/Andrewwango/gds-accessible-search/main/component/dist/index.html -o component/index.html",
+    "compile-nunjucks": "mkdir -p dist && nunjucks-to-html www.gov.uk/**/*.html --dest dist ",
+    "copy-assets": "cp -R 'www.gov.uk/assets' 'dist/www.gov.uk/assets'",
+    "build": "yarn install-component && yarn compile-nunjucks && yarn copy-assets"
+  }
+}
