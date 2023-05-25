@@ -58,7 +58,8 @@ async function callBackend(context, query) {
 
     const responseJson = await response.json();
     const output = responseJson["output"]
-    console.log(`Prompt: ${prompt}`)
+    console.log(`Query: ${query}`)
+    console.log(`Context: ${context}`)
     console.log(`Output: ${output}`)
     return output
 }
