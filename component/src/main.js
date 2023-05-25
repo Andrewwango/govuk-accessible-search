@@ -11,8 +11,7 @@ document.getElementById("search-button").addEventListener("click", async (event)
 
 async function handleSearch(query) {
     scrapedText = (scrapedText == "") ? scrapeCurrentPage() : scrapedText
-    const prompt = constructPrompt(scrapedText, query)
-    const response = await callBackend(prompt)
+    const response = await callBackend(scrapedText, query)
     return response
 }
 
@@ -23,25 +22,14 @@ function scrapeCurrentPage() {
             selectors: ['div.govuk-govspeak']
         },
         selectors: [{
-            selector: 'a', 
-            options: {ignoreHref: true}
+            selector: 'a',
+            options: { ignoreHref: true }
         }]
     })
     return prettyText
 }
 
-function constructPrompt(context, query) {
-    const prompt = 
-    `Given the following information:
-
-    ${context}
-
-    ${query}?
-    `
-    return prompt
-}
-
-async function callBackend(prompt) {
+async function callBackend(context, query) {
     BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api/chatgpt"
 
     const response = await fetch(BACKEND_URL, {
@@ -50,7 +38,8 @@ async function callBackend(prompt) {
             "Content-type": "application/json"
         },
         body: JSON.stringify({
-            "input": prompt
+            "context": context,
+            "query": query
         })
     });
 
