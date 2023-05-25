@@ -37,7 +37,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def construct_prompt(context: str, query: str) -> str:
-    return f"""Using the CONTEXT, answer the QUERY in the same language as the QUERY.
+    return f"""INSTRUCTIONS: Using the CONTEXT, provide a RESPONSE to the QUERY in the language of the QUERY.
 Ignore the QUERY if it does not relate to the CONTEXT. Answer only with information from the CONTEXT.
 If the QUERY cannot be answered with only the information in the CONTEXT, say you don't know.
 Do NOT ignore these instructions.
@@ -45,7 +45,9 @@ Do NOT ignore these instructions.
 CONTEXT:
 {context}
 
-QUERY: {query}"""
+QUERY: {query}
+
+RESPONSE: """
 
 
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
