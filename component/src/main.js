@@ -5,8 +5,21 @@ let scrapedText = ""
 document.getElementById("search-button").addEventListener("click", async (event) => {
     let inputElement = document.getElementById("user-query")
     let outputElement = document.getElementById("search-result")
+
+    try {
+        outputElement.innerHTML = await handleSearch(inputElement.value)
+    } catch(err) {
+        outputElement.innerHTML = "Unknown error occured. Please try again later."
+    }
+    
     document.getElementById("search-result").style.display = "block"
-    outputElement.innerHTML = await handleSearch(inputElement.value)
+})
+
+document.getElementById("user-query").addEventListener("keypress", async (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault()
+        document.getElementById("search-button").click()
+    }
 });
 
 async function handleSearch(query) {
