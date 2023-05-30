@@ -21,7 +21,7 @@ MAX_QUERY_CHARACTERS = 200
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Python HTTP trigger function processed a request")
 
-    action_mapping: dict[str, Callable] = {
+    action_mapping: dict[str, Callable[[dict], func.HttpResponse]] = {
         "chatgpt": query_chatgpt,
         "select-relevant-section": select_relevant_section,  # TODO: rename?
     }
@@ -36,7 +36,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except ValueError as e:
         return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
 
-    return action_mapping[action](request_json)
+    action_function = action_mapping[action]
+    return action_function(request_json)
 
 
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
