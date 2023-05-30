@@ -66,17 +66,9 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
 
     prompt = construct_query_prompt(context, query)
 
-    output = perform_chat_completion(prompt, parameters)
+    response_dict = perform_chat_completion(prompt, parameters)
 
-    response = {
-        "output": output
-    }
-
-    return func.HttpResponse(
-        json.dumps(response),
-        status_code=200,
-        headers={"Content-Type": "application/json"},
-    )
+    return build_response(response_dict)
 
 
 def construct_select_prompt(options: list[str], query: str) -> str:
@@ -101,20 +93,20 @@ def select_relevant_section(parameters: dict) -> func.HttpResponse:
 
     prompt = construct_select_prompt(options, query)
 
-    output = perform_chat_completion(prompt, parameters, max_tokens=16)
+    response_dict = perform_chat_completion(prompt, parameters, max_tokens=16)
 
-    response = {
-        "output": output
-    }
+    return build_response(response_dict)
 
+
+def build_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:
     return func.HttpResponse(
-        json.dumps(response),
-        status_code=200,
+        json.dumps(response_dict),
+        status_code=status_code,
         headers={"Content-Type": "application/json"},
     )
 
 
-def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> str:
+def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
@@ -124,4 +116,7 @@ def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> str:
     )
 
     output = chat_completion.choices[0].message.content
-    return output
+
+    return {
+        "output": output
+    }
