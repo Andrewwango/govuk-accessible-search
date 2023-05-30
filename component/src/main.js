@@ -32,7 +32,7 @@ function scrapeCurrentPage() {
     const rawHtml = window.parent.document.body.outerHTML
     const prettyText = htmlToText.convert(rawHtml, {
         baseElements: {
-            selectors: ['div.govuk-govspeak']
+            selectors: ['div.govuk-govspeak', 'article']
         },
         selectors: [{
             selector: 'a',

@@ -43,7 +43,7 @@ at the desired location. Then build your website how you normally would. This em
 
 ## Live demo
 
-A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html).
+A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
 
 ## Developer guide
 
@@ -52,7 +52,7 @@ A demo of the component in action on a sample GOV.UK website can be viewed [live
 1. Download a GOV.UK website. Here's an example using the website describing [France foreign travel advice](https://www.gov.uk/foreign-travel-advice/france/entry-requirements):
 
 ```bash
-cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france/entry-requirements
+cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france
 ```
 
 2. Add component anywhere in the website HTML using a Nunjucks include: 
@@ -64,6 +64,8 @@ cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --
 <!-- {% endraw %} -->
 
 3. Build the site using `yarn install && yarn build` and optionally run locally using `yarn test`.
+
+Note: to use on a NHS webpage, instead include `component/index_nhs.html` which has all GOV.UK tags replaced with their NHS.UK counterparts.
 
 ### Build component
 
