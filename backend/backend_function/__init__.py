@@ -101,7 +101,7 @@ def select_relevant_section(parameters: dict) -> func.HttpResponse:
 
     prompt = construct_select_prompt(options, query)
 
-    output = perform_chat_completion(prompt, parameters)
+    output = perform_chat_completion(prompt, parameters, max_tokens=16)
 
     response = {
         "output": output
@@ -114,12 +114,13 @@ def select_relevant_section(parameters: dict) -> func.HttpResponse:
     )
 
 
-def perform_chat_completion(prompt: str, parameters: dict) -> str:
+def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> str:
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
         temperature=parameters.get("temperature", 0.1),  # low temp seems good for this sort of task
+        **kwargs,
     )
 
     output = chat_completion.choices[0].message.content
