@@ -24,8 +24,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Python HTTP trigger function processed a request")
 
     action_mapping: dict[str, Callable[[dict], func.HttpResponse]] = {
-        "chatgpt": query_chatgpt,
-        "select-relevant-section": select_relevant_section,  # TODO: rename?
+        "chatgpt": action_query_chatgpt,
+        "select-relevant-section": action_select_relevant_section,
     }
 
     action = req.route_params.get("action")
@@ -42,7 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return action_function(request_json)
 
 
-def query_chatgpt(parameters: dict) -> func.HttpResponse:
+def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
     query = preprocess_query(parameters["query"])
     context = preprocess_context(parameters["context"])
 
@@ -53,7 +53,7 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
     return build_response(response_dict)
 
 
-def select_relevant_section(parameters: dict) -> func.HttpResponse:
+def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
     query = preprocess_query(parameters["query"])
     options: list[str] = parameters["options"]
 
