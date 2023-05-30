@@ -61,6 +61,8 @@ cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --
 
 3. Build the site using `yarn install && yarn build` and optionally run locally using `yarn test`.
 
+Note: to use on a NHS webpage, instead include `component/index_nhs.html` which has all GOV.UK tags replaced with their NHS.UK counterparts.
+
 ### Build component
 
 Note that the CSS file is only needed to import styles for the Government Design System components, and the assets (images and fonts) are those included with GDS following this [tutorial](https://frontend.design-system.service.gov.uk/get-started/#4-get-the-font-and-images-working).
