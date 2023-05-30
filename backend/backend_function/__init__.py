@@ -38,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return action_mapping[action](request_json)
 
 
-def construct_prompt(context: str, query: str) -> str:
+def construct_query_prompt(context: str, query: str) -> str:
     return f"""QUERY: {query}
 
 INSTRUCTIONS: Using the CONTEXT, provide a RESPONSE to the QUERY in the language of the QUERY.
@@ -63,7 +63,7 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
         logging.warning("Context too long, truncating...")
         context = context[-MAX_CONTEXT_CHARACTERS:]
 
-    prompt = construct_prompt(context, query)
+    prompt = construct_query_prompt(context, query)
 
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
