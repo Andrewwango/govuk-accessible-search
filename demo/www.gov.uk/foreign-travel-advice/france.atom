@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://www.gov.uk/foreign-travel-advice/france</id>
+  <link rel="alternate" type="text/html" href="https://www.gov.uk/foreign-travel-advice/france"/>
+  <link rel="self" type="application/atom+xml" href="https://www.gov.uk/foreign-travel-advice/france.atom"/>
+  <title>Travel Advice Summary</title>
+  <updated>2023-05-09T15:03:24+01:00</updated>
+  <author>
+    <name>GOV.UK</name>
+  </author>
+  <entry>
+    <id>https://www.gov.uk/foreign-travel-advice/france#2023-05-09 15:03:24 +0100</id>
+    <updated>2023-05-09T15:03:24+01:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.gov.uk/foreign-travel-advice/france"/>
+    <title>France travel advice</title>
+    <link rel="self" type="application/atom+xml" href="https://www.gov.uk/foreign-travel-advice/france.atom"/>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Information on upcoming scheduled strike days ('Summary' page). Advice on altitude sickness ('Health' page), and having appropriate insurance for travelling to mountainous areas ('Safety and security' page). Plus editorial changes throughout the France page.</p>      </div>
+    </summary>
+  </entry>
+</feed>
