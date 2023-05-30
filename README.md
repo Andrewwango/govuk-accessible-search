@@ -41,7 +41,7 @@ at the desired location. Then build your website how you normally would. This em
 
 ## Live demo
 
-A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html).
+A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
 
 ## Developer guide
 
