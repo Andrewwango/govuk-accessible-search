@@ -1,7 +1,3 @@
----
-render_with_liquid: false
----
-
 # gds-accessible-search
 An intelligent search bar to improve accessibility on GOV.UK/NHS.UK pages using OpenAI. 
 
@@ -38,7 +34,9 @@ Our solution will provide the following functionality:
 To use our component on your government webpage, simply copy the component HTML file from `component/dist/index.html` and insert the component using a Nunjucks `include`:
 
 ```html
+{% raw %}
 {% include "component/index.html" %}
+{% endraw %}
 ```
 
 at the desired location. Then build your website how you normally would. This embeds the component HTML along with all javascripts. CSS is not needed as the GOV.UK website will already have the necessary CSS.
@@ -60,7 +58,9 @@ cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --
 2. Add component anywhere in the website HTML using a Nunjucks include: 
 
 ```html
+{% raw %}
 {% include "component/index.html" %}
+{% endraw %}
 ```
 
 3. Build the site using `yarn install && yarn build` and optionally run locally using `yarn test`.
