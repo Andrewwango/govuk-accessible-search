@@ -40,15 +40,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
-    query, context = parameters["query"], parameters["context"]
-
-    if len(query) > MAX_QUERY_CHARACTERS:
-        logging.warning("Query too long, truncating...")
-        query = query[-MAX_QUERY_CHARACTERS:]
-
-    if len(context) > MAX_CONTEXT_CHARACTERS:
-        logging.warning("Context too long, truncating...")
-        context = context[-MAX_CONTEXT_CHARACTERS:]
+    query = preprocess_query(parameters["query"])
+    context = preprocess_context(parameters["context"])
 
     prompt = construct_query_prompt(context, query)
 
@@ -58,17 +51,28 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
 
 
 def select_relevant_section(parameters: dict) -> func.HttpResponse:
-    query, options = parameters["query"], parameters["options"]
-
-    if len(query) > MAX_QUERY_CHARACTERS:
-        logging.warning("Query too long, truncating...")
-        query = query[-MAX_QUERY_CHARACTERS:]
+    query = preprocess_query(parameters["query"])
+    options: list[str] = parameters["options"]
 
     prompt = construct_select_prompt(options, query)
 
     response_dict = perform_chat_completion(prompt, parameters, max_tokens=16)
 
     return build_response(response_dict)
+
+
+def preprocess_query(query: str) -> str:
+    if len(query) > MAX_QUERY_CHARACTERS:
+        logging.warning("Query too long, truncating...")
+        query = query[-MAX_QUERY_CHARACTERS:]
+    return query
+
+
+def preprocess_context(context: str) -> str:
+    if len(context) > MAX_CONTEXT_CHARACTERS:
+        logging.warning("Context too long, truncating...")
+        context = context[-MAX_CONTEXT_CHARACTERS:]
+    return context
 
 
 def construct_query_prompt(context: str, query: str) -> str:
