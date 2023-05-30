@@ -11,8 +11,9 @@
   "scripts": {
     "test": "live-server dist",
     "install-component": "mkdir -p component && curl https://raw.githubusercontent.com/Andrewwango/gds-accessible-search/main/component/dist/index.html -o component/index.html",
-    "compile-nunjucks": "mkdir -p dist && nunjucks-to-html www.gov.uk/**/*.html --dest dist ",
-    "copy-assets": "cp -R 'www.gov.uk/assets' 'dist/www.gov.uk/assets'",
-    "build": "yarn install-component && yarn compile-nunjucks && yarn copy-assets"
+    "compile-nunjucks": "mkdir -p dist && nunjucks-to-html 'www.gov.uk/**/*.html' 'www.nhs.uk/**/*.html' --dest dist ",
+    "copy-gov-assets": "cp -R 'www.gov.uk/assets' 'dist/www.gov.uk/assets'",
+    "copy-nhs-assets": "cp -R 'www.nhs.uk/static' 'dist/www.nhs.uk/static'",
+    "build": "yarn install-component && yarn compile-nunjucks && yarn copy-gov-assets && yarn copy-nhs-assets"
   }
 }

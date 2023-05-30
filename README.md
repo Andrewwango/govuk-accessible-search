@@ -50,7 +50,7 @@ A demo of the component in action on a sample GOV.UK website can be viewed [live
 1. Download a GOV.UK website. Here's an example using the website describing [France foreign travel advice](https://www.gov.uk/foreign-travel-advice/france/entry-requirements):
 
 ```bash
-cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france/entry-requirements
+cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france
 ```
 
 2. Add component anywhere in the website HTML using a Nunjucks include: 
