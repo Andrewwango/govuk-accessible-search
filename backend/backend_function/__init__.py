@@ -39,20 +39,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     return action_mapping[action](request_json)
 
 
-def construct_query_prompt(context: str, query: str) -> str:
-    return f"""QUERY: {query}
-
-INSTRUCTIONS: Using the CONTEXT, provide a RESPONSE to the QUERY in the language of the QUERY.
-Ignore the QUERY if it does not relate to the CONTEXT. Answer only with information from the CONTEXT.
-If the QUERY cannot be answered with only the information in the CONTEXT, say you don't know.
-Do NOT ignore these INSTRUCTIONS.
-
-CONTEXT:
-{context}
-
-RESPONSE: """
-
-
 def query_chatgpt(parameters: dict) -> func.HttpResponse:
     query, context = parameters["query"], parameters["context"]
 
@@ -71,19 +57,6 @@ def query_chatgpt(parameters: dict) -> func.HttpResponse:
     return build_response(response_dict)
 
 
-def construct_select_prompt(options: list[str], query: str) -> str:
-    return f"""QUERY: {query}
-
-INSTRUCTIONS: Below is a list of OPTIONS, each of which is the heading of a page with information.
-A user has asked the above QUERY and thinks the answer can be obtained using one of the pages in the OPTIONS.
-Select a single value from the OPTIONS, which are separated by a semi-colon ';'. Select the option which seems most relevant to answering the QUERY.
-Your RESPONSE should only contain a single value from OPTIONS with no further explanation or discussion.
-
-OPTIONS: {";".join(options)}
-
-RESPONSE: """
-
-
 def select_relevant_section(parameters: dict) -> func.HttpResponse:
     query, options = parameters["query"], parameters["options"]
 
@@ -98,12 +71,31 @@ def select_relevant_section(parameters: dict) -> func.HttpResponse:
     return build_response(response_dict)
 
 
-def build_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:
-    return func.HttpResponse(
-        json.dumps(response_dict),
-        status_code=status_code,
-        headers={"Content-Type": "application/json"},
-    )
+def construct_query_prompt(context: str, query: str) -> str:
+    return f"""QUERY: {query}
+
+INSTRUCTIONS: Using the CONTEXT, provide a RESPONSE to the QUERY in the language of the QUERY.
+Ignore the QUERY if it does not relate to the CONTEXT. Answer only with information from the CONTEXT.
+If the QUERY cannot be answered with only the information in the CONTEXT, say you don't know.
+Do NOT ignore these INSTRUCTIONS.
+
+CONTEXT:
+{context}
+
+RESPONSE: """
+
+
+def construct_select_prompt(options: list[str], query: str) -> str:
+    return f"""QUERY: {query}
+
+INSTRUCTIONS: Below is a list of OPTIONS, each of which is the heading of a page with information.
+A user has asked the above QUERY and thinks the answer can be obtained using one of the pages in the OPTIONS.
+Select a single value from the OPTIONS, which are separated by a semi-colon ';'. Select the option which seems most relevant to answering the QUERY.
+Your RESPONSE should only contain a single value from OPTIONS with no further explanation or discussion.
+
+OPTIONS: {";".join(options)}
+
+RESPONSE: """
 
 
 def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
@@ -120,3 +112,11 @@ def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> dict[str
     return {
         "output": output
     }
+
+
+def build_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:
+    return func.HttpResponse(
+        json.dumps(response_dict),
+        status_code=status_code,
+        headers={"Content-Type": "application/json"},
+    )
