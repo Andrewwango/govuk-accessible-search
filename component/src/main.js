@@ -1,5 +1,6 @@
 const htmlToText = require('html-to-text');
 
+const BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api"
 let scrapedText = ""
 
 document.getElementById("search-button").addEventListener("click", async (event) => {
@@ -23,13 +24,34 @@ document.getElementById("user-query").addEventListener("keypress", async (event)
 });
 
 async function handleSearch(query) {
-    scrapedText = (scrapedText == "") ? scrapeCurrentPage() : scrapedText
-    const response = await callBackend(scrapedText, query)
-    return response
+    const currentPageRawHtml = window.parent.document.body.outerHTML
+    const scrapedHeadings = scrapeHeadings(currentPageRawHtml) 
+    //const most_relevant_section = await callSelectRelevantSectionBackend(query, scrapedHeadings)
+    const most_relevant_section = "CURRENT PAGE"
+    
+    if (most_relevant_section == "CURRENT PAGE") {
+        const relevantPageRawHtml = currentPageRawHtml
+    } else {
+        //TODO: logic to follow section's link and get that page's rawhtml
+        const relevantPageRawHtml = ""
+    }
+    //TODO: flag to store heading for most recently cached text, if too much effort just remove caching
+    scrapedText = (scrapedText == "") ? parseGovTextFromHtml(relevantPageRawHtml) : scrapedText
+    const answer = await callQueryBackend(scrapedText, query)
+    return answer
 }
 
-function scrapeCurrentPage() {
-    const rawHtml = window.parent.document.body.outerHTML
+function scrapeHeadings(rawHtml) {
+    const headings = htmlToText.convert(rawHtml, {
+        baseElements: {
+            selectors: ['li.gem-c-contents-list__list-item']
+        }
+    })
+    console.log(headings)
+    return ""
+}
+
+function parseGovTextFromHtml(rawHtml) {
     const prettyText = htmlToText.convert(rawHtml, {
         baseElements: {
             selectors: ['div.govuk-govspeak', 'article']
@@ -42,10 +64,8 @@ function scrapeCurrentPage() {
     return prettyText
 }
 
-async function callBackend(context, query) {
-    BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api/chatgpt"
-
-    const response = await fetch(BACKEND_URL, {
+async function callQueryBackend(context, query) {
+    const response = await fetch(`${BACKEND_URL}/chatgpt}`, {
         method: 'post',
         headers: {
             "Content-type": "application/json"
@@ -54,12 +74,31 @@ async function callBackend(context, query) {
             "context": context,
             "query": query
         })
-    });
+    })
 
-    const responseJson = await response.json();
+    const responseJson = await response.json()
     const output = responseJson["output"]
     console.log(`Query: ${query}`)
     console.log(`Context: ${context}`)
+    console.log(`Output: ${output}`)
+    return output
+}
+
+async function callSelectRelevantSectionBackend(query, headings) {
+    const response = await fetch(`${BACKEND_URL}/select-relevant-section}`, {
+        method: 'post',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+            "options": headings,
+            "query": query
+        })
+    })
+    const responseJson = await response.json()
+    const output = responseJson["output"]
+    console.log(`Query: ${query}`)
+    console.log(`Headings: ${headings}`)
     console.log(`Output: ${output}`)
     return output
 }
