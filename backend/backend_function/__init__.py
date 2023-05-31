@@ -44,7 +44,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
-    history = preprocess_history(parameters["history"])
+    history = preprocess_history(parameters.get("history", None))
     query = preprocess_query(parameters["query"])
     context = preprocess_context(parameters["context"])
 
@@ -56,7 +56,7 @@ def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
 
 
 def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
-    history = preprocess_history(parameters["history"])
+    history = preprocess_history(parameters.get("history", None))
     query = preprocess_query(parameters["query"])
 
     prompt = prompts.construct_select_prompt(parameters["options"], query)
@@ -67,6 +67,8 @@ def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
 
 
 def preprocess_history(history: list[dict]) -> list[dict]:
+    if history is None:
+        return []
     if len(history) > MAX_HISTORY_MESSAGES:
         logging.warning("History too long, clipping...")
         history = history[-MAX_HISTORY_MESSAGES:]
