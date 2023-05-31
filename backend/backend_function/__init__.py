@@ -50,7 +50,7 @@ def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
 
     response_dict = perform_chat_completion(prompt, parameters)
 
-    return build_response(response_dict)
+    return build_json_response(response_dict)
 
 
 def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
@@ -61,7 +61,7 @@ def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
 
     response_dict = perform_chat_completion(prompt, parameters, max_tokens=16)
 
-    return build_response(response_dict)
+    return build_json_response(response_dict)
 
 
 def preprocess_query(query: str) -> str:
@@ -102,7 +102,7 @@ def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> dict[str
     }
 
 
-def build_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:
+def build_json_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:
     return func.HttpResponse(
         json.dumps(response_dict),
         status_code=status_code,
