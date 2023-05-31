@@ -17,6 +17,7 @@ SELECT_PROMPT = f"""QUERY: {{query}}
 INSTRUCTIONS: Below is a list of OPTIONS, each of which is the heading of a page with information.
 A user has asked the above QUERY and thinks the answer can be obtained using one of the pages in the OPTIONS.
 Select a single value from the OPTIONS, which are separated by '{OPTION_SEPARATOR}'. Select the option which seems most relevant to answering the QUERY.
+If none of the OPTIONS appear relevant to the query, select the one which is marked as the current page.
 Your RESPONSE should only contain a single value from OPTIONS with no further explanation or discussion.
 
 OPTIONS: {{options}}
