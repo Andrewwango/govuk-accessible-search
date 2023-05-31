@@ -48,7 +48,7 @@ def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
     query = preprocess_query(parameters["query"])
     context = preprocess_context(parameters["context"])
 
-    prompt = construct_query_prompt(context, query)
+    prompt = prompts.construct_query_prompt(context, query)
 
     response_dict = perform_chat_completion(history, prompt, parameters)
 
@@ -59,7 +59,7 @@ def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
     history = preprocess_history(parameters["history"])
     query = preprocess_query(parameters["query"])
 
-    prompt = construct_select_prompt(parameters["options"], query)
+    prompt = prompts.construct_select_prompt(parameters["options"], query)
 
     response_dict = perform_chat_completion(history, prompt, parameters, max_tokens=16)
 
@@ -85,14 +85,6 @@ def preprocess_context(context: str) -> str:
         logging.warning("Context too long, truncating...")
         context = context[-MAX_CONTEXT_CHARACTERS:]
     return context
-
-
-def construct_query_prompt(context: str, query: str) -> str:
-    return prompts.QUERY_PROMPT.format(context=context, query=query)
-
-
-def construct_select_prompt(options: list[str], query: str) -> str:
-    return prompts.SELECT_PROMPT.format(options=prompts.OPTION_SEPARATOR.join(options), query=query)
 
 
 def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, **kwargs) -> dict[str, str]:

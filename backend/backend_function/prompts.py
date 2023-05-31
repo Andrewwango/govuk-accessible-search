@@ -22,3 +22,11 @@ Your RESPONSE should only contain a single value from OPTIONS with no further ex
 OPTIONS: {{options}}
 
 RESPONSE: """
+
+
+def construct_query_prompt(context: str, query: str) -> str:
+    return QUERY_PROMPT.format(context=context, query=query)
+
+
+def construct_select_prompt(options: list[str], query: str) -> str:
+    return SELECT_PROMPT.format(options=OPTION_SEPARATOR.join(options), query=query)
