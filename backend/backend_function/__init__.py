@@ -56,7 +56,7 @@ def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
 
 
 def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
-    history = preprocess_history(parameters.get("history", None))
+    history = preprocess_history(parameters.get("history", []))
     query = preprocess_query(parameters["query"])
 
     prompt = prompts.construct_select_prompt(parameters["options"], query)
