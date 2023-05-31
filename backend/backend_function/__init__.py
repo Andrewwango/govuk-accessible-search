@@ -6,7 +6,7 @@ from typing import Callable
 import azure.functions as func
 import openai
 
-import prompts
+from backend_function import prompts
 
 openai.api_type = "azure"
 openai.api_key = os.getenv("OPENAI_API_KEY")
