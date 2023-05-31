@@ -18,6 +18,7 @@ OPENAI_GPT_DEPLOYMENT = os.getenv("OPENAI_GPT_DEPLOYMENT")
 
 MAX_CONTEXT_CHARACTERS = int(os.getenv("MAX_CONTEXT_CHARACTERS", "10000"))
 MAX_QUERY_CHARACTERS = int(os.getenv("MAX_QUERY_CHARACTERS", "200"))
+MAX_HISTORY_MESSAGES = int(os.getenv("MAX_HISTORY_MESSAGES", "4"))
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -43,25 +44,33 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
+    history = preprocess_history(parameters["history"])
     query = preprocess_query(parameters["query"])
     context = preprocess_context(parameters["context"])
 
     prompt = construct_query_prompt(context, query)
 
-    response_dict = perform_chat_completion(prompt, parameters)
+    response_dict = perform_chat_completion(history, prompt, parameters)
 
     return build_json_response(response_dict)
 
 
 def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
+    history = preprocess_history(parameters["history"])
     query = preprocess_query(parameters["query"])
-    options: list[str] = parameters["options"]
 
-    prompt = construct_select_prompt(options, query)
+    prompt = construct_select_prompt(parameters["options"], query)
 
-    response_dict = perform_chat_completion(prompt, parameters, max_tokens=16)
+    response_dict = perform_chat_completion(history, prompt, parameters, max_tokens=16)
 
     return build_json_response(response_dict)
+
+
+def preprocess_history(history: list[dict]) -> list[dict]:
+    if len(history) > MAX_HISTORY_MESSAGES:
+        logging.warning("History too long, clipping...")
+        history = history[-MAX_HISTORY_MESSAGES:]
+    return history
 
 
 def preprocess_query(query: str) -> str:
@@ -83,14 +92,16 @@ def construct_query_prompt(context: str, query: str) -> str:
 
 
 def construct_select_prompt(options: list[str], query: str) -> str:
-    return prompts.SELECT_PROMPT.format(options=";".join(options), query=query)
+    return prompts.SELECT_PROMPT.format(options=prompts.OPTION_SEPARATOR.join(options), query=query)
 
 
-def perform_chat_completion(prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
+def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
+    messages = history + [{"role": "user", "content": prompt}]
+
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
+        messages=messages,
         temperature=parameters.get("temperature", 0.1),  # low temp seems good for this sort of task
         **kwargs,
     )
