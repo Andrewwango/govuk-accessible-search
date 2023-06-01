@@ -25,7 +25,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_query_chatgpt(request: func.HttpRequest) -> func.HttpResponse:
-    parameters: dict = get_request_json(request)
+    try:
+        parameters = request.get_json()
+    except ValueError as e:
+        return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
 
     history = preprocessing.preprocess_history(parameters.get("history", []))
     query = preprocessing.preprocess_query(parameters["query"])
@@ -39,7 +42,10 @@ def action_query_chatgpt(request: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_select_relevant_section(request: func.HttpRequest) -> func.HttpResponse:
-    parameters: dict = get_request_json(request)
+    try:
+        parameters = request.get_json()
+    except ValueError as e:
+        return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
 
     history = preprocessing.preprocess_history(parameters.get("history", []))
     query = preprocessing.preprocess_query(parameters["query"])
@@ -62,7 +68,11 @@ def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_text_to_speech(request: func.HttpRequest) -> func.HttpResponse:
-    pass
+    try:
+        parameters = request.get_json()
+    except ValueError as e:
+        return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
+
     # TODO
 
 
@@ -72,10 +82,3 @@ def build_json_response(response_dict: dict, status_code: int = 200) -> func.Htt
         status_code=status_code,
         headers={"Content-Type": "application/json"},
     )
-
-
-def get_request_json(request: func.HttpRequest) -> dict:
-    try:
-        return request.get_json()
-    except ValueError as e:
-        return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
