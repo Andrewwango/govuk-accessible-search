@@ -4,7 +4,7 @@ from typing import Callable
 
 import azure.functions as func
 
-from backend_function import llm, preprocessing, prompts
+from backend_function import preprocessing, prompts, services
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -36,7 +36,7 @@ def action_query_chatgpt(parameters: dict) -> func.HttpResponse:
 
     prompt = prompts.construct_query_prompt(context, query)
 
-    response_dict = llm.perform_chat_completion(history, prompt, parameters)
+    response_dict = services.perform_chat_completion(history, prompt, parameters)
 
     return build_json_response(response_dict)
 
@@ -47,7 +47,7 @@ def action_select_relevant_section(parameters: dict) -> func.HttpResponse:
 
     prompt = prompts.construct_select_prompt(parameters["options"], query)
 
-    response_dict = llm.perform_chat_completion(history, prompt, parameters, max_tokens=16)
+    response_dict = services.perform_chat_completion(history, prompt, parameters, max_tokens=16)
 
     return build_json_response(response_dict)
 
