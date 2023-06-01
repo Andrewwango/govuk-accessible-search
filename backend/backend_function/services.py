@@ -1,3 +1,4 @@
+import io
 import os
 
 from azure.cognitiveservices import speech
@@ -36,11 +37,10 @@ def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, 
     }
 
 
-def perform_speech_to_text(___) -> ...:
+def perform_speech_to_text(filename: str) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
     speech_config.speech_recognition_language="en-US"
-    # TODO: we probably want to use `stream=` not `filename=`
-    audio_config = speech.audio.AudioConfig(filename=...)
+    audio_config = speech.audio.AudioConfig(filename=filename)
 
     recognizer = speech.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
@@ -56,7 +56,7 @@ def perform_speech_to_text(___) -> ...:
     }
 
 
-def perform_text_to_speech(text: str) -> ...:
+def perform_text_to_speech(text: str) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
     speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
 
@@ -67,6 +67,9 @@ def perform_text_to_speech(text: str) -> ...:
     if result.reason == speech.ResultReason.Canceled:
         raise Exception("Error in speech synthesis")
 
-    stream = speech.AudioDataStream(result)
-    # TODO: maybe not just return the stream?
-    return stream
+    buffer = io.BytesIO()
+    speech.AudioDataStream(result).read_data(buffer)
+
+    return {
+        "output": buffer.getvalue()
+    }

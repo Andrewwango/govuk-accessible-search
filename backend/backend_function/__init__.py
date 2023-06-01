@@ -60,9 +60,10 @@ def action_select_relevant_section(request: func.HttpRequest) -> func.HttpRespon
 def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
     # TODO: do some validation on this file
     file = request.files.values()[0]
-    contents = file.stream.read()
+    filename = "temp.wav"
+    # TODO: save file to `filename`
 
-    response_dict = services.perform_speech_to_text(contents)
+    response_dict = services.perform_speech_to_text(filename)
 
     return build_json_response(response_dict)
 
@@ -73,7 +74,9 @@ def action_text_to_speech(request: func.HttpRequest) -> func.HttpResponse:
     except ValueError as e:
         return func.HttpResponse(f"Invalid parameters received: {e}", status_code=400)
 
-    # TODO
+    response_dict = services.perform_text_to_speech(parameters["text"])
+
+    return build_json_response(response_dict)
 
 
 def build_json_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:
