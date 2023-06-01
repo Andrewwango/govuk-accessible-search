@@ -10,6 +10,8 @@ openai.api_version = "2023-05-15"
 OPENAI_CHATGPT_DEPLOYMENT = os.getenv("OPENAI_CHATGPT_DEPLOYMENT")
 OPENAI_GPT_DEPLOYMENT = os.getenv("OPENAI_GPT_DEPLOYMENT")
 
+LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.1"))
+
 
 def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
     messages = history + [{"role": "user", "content": prompt}]
@@ -18,7 +20,7 @@ def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, 
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
         messages=messages,
-        temperature=parameters.get("temperature", 0.1),  # low temp seems good for this sort of task
+        temperature=parameters.get("temperature", LLM_DEFAULT_TEMPERATURE),
         **kwargs,
     )
 
