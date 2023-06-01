@@ -61,7 +61,10 @@ def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
     # TODO: do some validation on this file
     file = request.files.values()[0]
     filename = "temp.wav"
-    # TODO: save file to `filename`
+
+    content = file.stream.read()
+    with open(filename, "wb") as f:
+        f.write(content)
 
     response_dict = services.perform_speech_to_text(filename)
 
