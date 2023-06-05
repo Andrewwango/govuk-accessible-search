@@ -4,7 +4,8 @@ from typing import Callable
 
 import azure.functions as func
 
-from backend_function import exceptions, preprocessing, prompts, services
+from backend_function import preprocessing, prompts, services
+from backend_function.exceptions import HTTPException
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -23,7 +24,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return action_mapping[action](req)
     except KeyError:
         return func.HttpResponse(f"Invalid action: {action}", status_code=400)
-    except exceptions.GDSBackendException as ex:
+    except HTTPException as ex:
         return func.HttpResponse(ex.msg, status_code=ex.status_code)
 
 
@@ -78,7 +79,7 @@ def get_request_json(request: func.HttpRequest) -> dict:
     try:
         return request.get_json()
     except ValueError as e:
-        raise exceptions.GDSBackendException(f"Invalid parameters received: {e}", status_code=400)
+        raise HTTPException(f"Invalid parameters received: {e}", status_code=400)
 
 
 def build_json_response(response_dict: dict, status_code: int = 200) -> func.HttpResponse:

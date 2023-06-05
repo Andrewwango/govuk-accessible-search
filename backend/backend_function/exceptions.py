@@ -1,4 +1,4 @@
-class GDSBackendException(Exception):
+class HTTPException(Exception):
     msg: str
     status_code: int
 
