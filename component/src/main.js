@@ -5,8 +5,21 @@ let scrapedText = ""
 document.getElementById("search-button").addEventListener("click", async (event) => {
     let inputElement = document.getElementById("user-query")
     let outputElement = document.getElementById("search-result")
+
+    try {
+        outputElement.innerHTML = await handleSearch(inputElement.value)
+    } catch(err) {
+        outputElement.innerHTML = "Unknown error occured. Please try again later."
+    }
+    
     document.getElementById("search-result").style.display = "block"
-    outputElement.innerHTML = await handleSearch(inputElement.value)
+})
+
+document.getElementById("user-query").addEventListener("keypress", async (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault()
+        document.getElementById("search-button").click()
+    }
 });
 
 async function handleSearch(query) {
@@ -19,7 +32,7 @@ function scrapeCurrentPage() {
     const rawHtml = window.parent.document.body.outerHTML
     const prettyText = htmlToText.convert(rawHtml, {
         baseElements: {
-            selectors: ['div.govuk-govspeak']
+            selectors: ['div.govuk-govspeak', 'article']
         },
         selectors: [{
             selector: 'a',
@@ -45,7 +58,8 @@ async function callBackend(context, query) {
 
     const responseJson = await response.json();
     const output = responseJson["output"]
-    console.log(`Prompt: ${prompt}`)
+    console.log(`Query: ${query}`)
+    console.log(`Context: ${context}`)
     console.log(`Output: ${output}`)
     return output
 }
