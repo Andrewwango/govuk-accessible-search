@@ -44,17 +44,26 @@ async function handleSearch(query) {
 function scrapeHeadings(rawHtml) {
     const headings = htmlToText.convert(rawHtml, {
         baseElements: {
-            selectors: ['li.gem-c-contents-list__list-item']
+            selectors: [
+                'nav.gem-c-contents-list', // GOV.UK "Contents" list
+                'nav.beta-nhsuk-navigation-sideways', // NHS.UK child page "More in..." list
+                'ul.nhsuk-hub-key-links'], // NHS.UK parent page "Contents" list
+            returnDomByDefault: false
         }
     })
-    console.log(headings)
+    //TODO disable line wrap!!
+    //may need to look at "baseUrl" option for html-to-text to deal with scraped relative links
+    const headingsList = headings.split('\n').map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/) )
+
+    console.log(headingsList)
     return ""
 }
 
 function parseGovTextFromHtml(rawHtml) {
     const prettyText = htmlToText.convert(rawHtml, {
         baseElements: {
-            selectors: ['div.govuk-govspeak', 'article']
+            selectors: ['div.govuk-govspeak', 'article'],
+            returnDomByDefault: false
         },
         selectors: [{
             selector: 'a',
