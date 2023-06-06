@@ -11,7 +11,7 @@ from backend_function.exceptions import HTTPException
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Python HTTP trigger function processed a request")
 
-    action_mapping: dict[str, Callable[[dict], func.HttpResponse]] = {
+    action_mapping: dict[str, Callable[[func.HttpRequest], func.HttpResponse]] = {
         "chatgpt": action_query_chatgpt,
         "select-relevant-section": action_select_relevant_section,
         "speech-to-text": action_speech_to_text,
