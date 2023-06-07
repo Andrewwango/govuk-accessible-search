@@ -10,6 +10,7 @@ document.getElementById("search-button").addEventListener("click", async (event)
     try {
         outputElement.innerHTML = await handleSearch(inputElement.value)
     } catch(err) {
+        console.log(err)
         outputElement.innerHTML = "Unknown error occured. Please try again later."
     }
     
@@ -25,15 +26,16 @@ document.getElementById("user-query").addEventListener("keypress", async (event)
 
 async function handleSearch(query) {
     const currentPageRawHtml = window.parent.document.body.outerHTML
+    let relevantPageRawHtml = ""
+
     const scrapedHeadings = scrapeHeadings(currentPageRawHtml) 
-    //const most_relevant_section = await callSelectRelevantSectionBackend(query, scrapedHeadings)
-    const most_relevant_section = "CURRENT PAGE"
+    const most_relevant_section = await callSelectRelevantSectionBackend(query, scrapedHeadings.map(x=>x.heading))
     
     if (most_relevant_section == "CURRENT PAGE") {
-        const relevantPageRawHtml = currentPageRawHtml
+        relevantPageRawHtml = currentPageRawHtml
     } else {
         //TODO: logic to follow section's link and get that page's rawhtml
-        const relevantPageRawHtml = ""
+        relevantPageRawHtml = currentPageRawHtml
     }
     //TODO: flag to store heading for most recently cached text, if too much effort just remove caching
     scrapedText = (scrapedText == "") ? parseGovTextFromHtml(relevantPageRawHtml) : scrapedText
@@ -43,6 +45,7 @@ async function handleSearch(query) {
 
 function scrapeHeadings(rawHtml) {
     const headings = htmlToText.convert(rawHtml, {
+        wordwrap: false,
         baseElements: {
             selectors: [
                 'nav.gem-c-contents-list', // GOV.UK "Contents" list
@@ -51,12 +54,18 @@ function scrapeHeadings(rawHtml) {
             returnDomByDefault: false
         }
     })
-    //TODO disable line wrap!!
     //may need to look at "baseUrl" option for html-to-text to deal with scraped relative links
-    const headingsList = headings.split('\n').map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/) )
+    const headingsList = headings
+        .split('\n')
+        .map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/) )
+        .concat([['', 'CURRENT PAGE']])
+        .map(x => {return {
+            heading: x[1].trim(),
+            url: x.length < 3 ? "" : x[2]
+        }})
 
     console.log(headingsList)
-    return ""
+    return headingsList
 }
 
 function parseGovTextFromHtml(rawHtml) {
@@ -74,7 +83,7 @@ function parseGovTextFromHtml(rawHtml) {
 }
 
 async function callQueryBackend(context, query) {
-    const response = await fetch(`${BACKEND_URL}/chatgpt}`, {
+    const response = await fetch(`${BACKEND_URL}/chatgpt`, {
         method: 'post',
         headers: {
             "Content-type": "application/json"
@@ -94,7 +103,7 @@ async function callQueryBackend(context, query) {
 }
 
 async function callSelectRelevantSectionBackend(query, headings) {
-    const response = await fetch(`${BACKEND_URL}/select-relevant-section}`, {
+    const response = await fetch(`${BACKEND_URL}/select-relevant-section`, {
         method: 'post',
         headers: {
             "Content-type": "application/json"
