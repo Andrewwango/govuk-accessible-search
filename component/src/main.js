@@ -85,6 +85,7 @@ function scrapeHeadings(rawHtml) {
 	const headingsList = headings
 		.split("\n")
 		.map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/g))
+		.filter((x) => x.length > 1)
 		.concat([["", "CURRENT PAGE"]])
 		.map((x) => {
 			return {
