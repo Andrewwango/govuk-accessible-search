@@ -1,4 +1,4 @@
-import io
+import base64
 import os
 
 from azure.cognitiveservices import speech
@@ -71,9 +71,13 @@ def perform_text_to_speech(text: str) -> dict:
                 error_message = "Error details: {}".format(cancellation_details.error_details)
         raise Exception(error_message)
 
-    buffer = bytes()
-    speech.AudioDataStream(result).read_data(buffer)
+    audio_data = bytearray()
+    buffer = bytes(16000)
+    stream = speech.AudioDataStream(result)
+
+    while (filled_size := stream.read_data(buffer)) > 0:
+        audio_data.extend(buffer[:filled_size])
 
     return {
-        "output": buffer.decode("base64")
+        "output": base64.b64encode(audio_data).decode()
     }
