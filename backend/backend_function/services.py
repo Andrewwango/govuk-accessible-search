@@ -48,7 +48,11 @@ def perform_speech_to_text(filename: str) -> dict:
     if result.reason == speech.ResultReason.NoMatch:
         raise ValueError("No valid speech detected")
     if result.reason == speech.ResultReason.Canceled:
-        raise Exception("Error in speech recognition")
+        error_message = "Error in speech synthesis"
+        cancellation_details = result.cancellation_details
+        if cancellation_details.reason == speech.CancellationReason.Error:
+            error_message = "Error details: {}".format(cancellation_details.error_details)
+        raise Exception(error_message)
 
     return {
         "output": result.text
