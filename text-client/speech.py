@@ -34,10 +34,10 @@ def test_speech_to_text(backend_url: str):
 
     while True:
         try:
-            # TODO: audio file for upload
+            with open("test.wav", "rb") as audio_file:
+                files = {"file": audio_file}
+                response = requests.post(f"{backend_url}/{action}", files=files)
 
-            # TODO: attach file
-            response = requests.post(f"{backend_url}/{action}")
             response.raise_for_status()
 
             output = response.json()["output"]
