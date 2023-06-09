@@ -14,7 +14,6 @@ OPENAI_GPT_DEPLOYMENT = os.getenv("OPENAI_GPT_DEPLOYMENT")
 
 AZURE_SPEECH_KEY = os.getenv("AZURE_SPEECH_KEY")
 AZURE_SPEECH_REGION = os.getenv("AZURE_SPEECH_REGION")
-AZURE_SPEECH_VOICE = os.getenv("AZURE_SPEECH_VOICE")
 
 LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.1"))
 
@@ -39,7 +38,7 @@ def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, 
 
 def perform_speech_to_text(filename: str) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
-    speech_config.speech_recognition_language="en-US"
+    speech_config.speech_recognition_language = "en-US"
     audio_config = speech.audio.AudioConfig(filename=filename)
 
     recognizer = speech.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
@@ -58,18 +57,23 @@ def perform_speech_to_text(filename: str) -> dict:
 
 def perform_text_to_speech(text: str) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
-    speech_config.speech_synthesis_voice_name = AZURE_SPEECH_VOICE
+    speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
 
     synthesizer = speech.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
     result = synthesizer.speak_text_async(text).get()
 
     if result.reason == speech.ResultReason.Canceled:
-        raise Exception("Error in speech synthesis")
+        error_message = "Error in speech synthesis"
+        cancellation_details = result.cancellation_details
+        if cancellation_details.reason == speech.CancellationReason.Error:
+            if cancellation_details.error_details:
+                error_message = "Error details: {}".format(cancellation_details.error_details)
+        raise Exception(error_message)
 
-    buffer = io.BytesIO()
+    buffer = bytes()
     speech.AudioDataStream(result).read_data(buffer)
 
     return {
-        "output": buffer.getvalue()
+        "output": buffer.decode("base64")
     }
