@@ -46,7 +46,9 @@ def perform_speech_to_text(filename: str) -> dict:
     result = recognizer.recognize_once_async().get()
 
     if result.reason == speech.ResultReason.NoMatch:
-        raise ValueError("No valid speech detected")
+        return {
+            "output": ""
+        }
     if result.reason == speech.ResultReason.Canceled:
         error_message = "Error in speech synthesis"
         cancellation_details = result.cancellation_details

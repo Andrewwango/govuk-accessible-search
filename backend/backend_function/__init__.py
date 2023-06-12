@@ -57,7 +57,7 @@ def action_select_relevant_section(request: func.HttpRequest) -> func.HttpRespon
 
 def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
     file = list(request.files.values())[0]
-    filename = "temp.wav"
+    filename = "/tmp/temp.wav"
 
     content = file.stream.read()
     with open(filename, "wb") as f:
