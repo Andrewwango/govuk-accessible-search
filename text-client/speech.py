@@ -32,21 +32,27 @@ def test_text_to_speech(backend_url: str):
 def test_speech_to_text(backend_url: str):
     action = "speech-to-text"
 
-    try:
-        with open("test.wav", "rb") as audio_file:
-            files = {"file": audio_file}
-            response = requests.post(f"{backend_url}/{action}", files=files)
+    while True:
+        try:
+            filepath = typer.prompt("Audio file").strip()
+            if not filepath:
+                continue
 
-        response.raise_for_status()
+            with open(filepath, "rb") as audio_file:
+                files = {"file": audio_file}
+                response = requests.post(f"{backend_url}/{action}", files=files)
 
-        output = response.json()["output"]
+            response.raise_for_status()
 
-        print(output)
-        print()
-    except typer.Abort:
-        typer.echo("Exiting...")
-    except Exception as e:
-        typer.echo(f"Error: {e}")
+            output = response.json()["output"]
+
+            print(output)
+            print()
+        except typer.Abort:
+            typer.echo("Exiting...")
+            break
+        except Exception as e:
+            typer.echo(f"Error: {e}")
 
 
 @app.command()
