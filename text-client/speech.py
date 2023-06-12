@@ -32,28 +32,27 @@ def test_text_to_speech(backend_url: str):
 def test_speech_to_text(backend_url: str):
     action = "speech-to-text"
 
-    while True:
-        try:
-            with open("test.wav", "rb") as audio_file:
-                files = {"file": audio_file}
-                response = requests.post(f"{backend_url}/{action}", files=files)
+    try:
+        with open("test.wav", "rb") as audio_file:
+            files = {"file": audio_file}
+            response = requests.post(f"{backend_url}/{action}", files=files)
 
-            response.raise_for_status()
+        response.raise_for_status()
 
-            output = response.json()["output"]
+        output = response.json()["output"]
 
-            print(output)
-            print()
-        except typer.Abort:
-            typer.echo("Exiting...")
-            break
-        except Exception as e:
-            typer.echo(f"Error: {e}")
+        print(output)
+        print()
+    except typer.Abort:
+        typer.echo("Exiting...")
+        break
+    except Exception as e:
+        typer.echo(f"Error: {e}")
 
 
 @app.command()
 def main(backend_url: str = "https://shwast-fun-app.azurewebsites.net/api"):
-    test_text_to_speech(backend_url)
+    test_speech_to_text(backend_url)
 
 
 if __name__ == "__main__":
