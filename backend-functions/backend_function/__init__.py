@@ -4,7 +4,7 @@ from typing import Callable
 
 import azure.functions as func
 
-from accessible_search import preprocessing, prompts, services
+from accessible_search import preprocessing, prompts, protocol, services
 from backend_function.exceptions import HTTPException
 
 
@@ -29,28 +29,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_query_chatgpt(request: func.HttpRequest) -> func.HttpResponse:
-    parameters = get_request_json(request)
+    parameters = protocol.ChatGPTRequest(**get_request_json(request))
 
-    history = preprocessing.preprocess_history(parameters.get("history", []))
-    query = preprocessing.preprocess_query(parameters["query"])
-    context = preprocessing.preprocess_context(parameters["context"])
+    history = preprocessing.preprocess_history(parameters.history)
+    query = preprocessing.preprocess_query(parameters.query)
+    context = preprocessing.preprocess_context(parameters.context)
 
     prompt = prompts.construct_query_prompt(context, query)
 
-    response_dict = services.perform_chat_completion(history, prompt, parameters)
+    response_dict = services.perform_chat_completion(history, prompt, temperature=parameters.temperature)
 
     return build_json_response(response_dict)
 
 
 def action_select_relevant_section(request: func.HttpRequest) -> func.HttpResponse:
-    parameters = get_request_json(request)
+    parameters = protocol.SelectRelevantSectionRequest(**get_request_json(request))
 
-    history = preprocessing.preprocess_history(parameters.get("history", []))
-    query = preprocessing.preprocess_query(parameters["query"])
+    history = preprocessing.preprocess_history(parameters.history)
+    query = preprocessing.preprocess_query(parameters.query)
 
-    prompt = prompts.construct_select_prompt(parameters["options"], query)
+    prompt = prompts.construct_select_prompt(parameters.options, query)
 
-    response_dict = services.perform_chat_completion(history, prompt, parameters, max_tokens=16)
+    response_dict = services.perform_chat_completion(history, prompt, max_tokens=16)
 
     return build_json_response(response_dict)
 
@@ -69,8 +69,8 @@ def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_text_to_speech(request: func.HttpRequest) -> func.HttpResponse:
-    parameters = get_request_json(request)
-    response_dict = services.perform_text_to_speech(parameters["text"])
+    parameters = protocol.TextToSpeechRequest(**get_request_json(request))
+    response_dict = services.perform_text_to_speech(parameters.text)
     return build_json_response(response_dict)
 
 

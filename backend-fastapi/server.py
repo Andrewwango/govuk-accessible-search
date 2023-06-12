@@ -3,8 +3,7 @@ from typing import Annotated
 import fastapi
 import uvicorn
 
-from accessible_search import preprocessing, prompts, services
-import protocol
+from accessible_search import preprocessing, prompts, protocol, services
 
 app = fastapi.FastAPI()
 
@@ -17,7 +16,7 @@ def query_chatgpt(parameters: protocol.ChatGPTRequest):
 
     prompt = prompts.construct_query_prompt(context, query)
 
-    response_dict = services.perform_chat_completion(history, prompt, parameters)
+    response_dict = services.perform_chat_completion(history, prompt, temperature=parameters.temperature)
 
     return protocol.TextOutputResponse(**response_dict)
 
@@ -29,7 +28,9 @@ def select_relevant_section(parameters: protocol.SelectRelevantSectionRequest):
 
     prompt = prompts.construct_select_prompt(parameters.options, query)
 
-    response_dict = services.perform_chat_completion(history, prompt, parameters, max_tokens=16)
+    response_dict = services.perform_chat_completion(
+        history, prompt, temperature=parameters.temperatrue, max_tokens=16
+    )
 
     return protocol.TextOutputResponse(**response_dict)
 
