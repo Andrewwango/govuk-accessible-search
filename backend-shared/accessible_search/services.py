@@ -36,10 +36,19 @@ def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, 
     }
 
 
-def perform_speech_to_text(filename: str) -> dict:
+def perform_speech_to_text(filename: str = None, content: bytes = None) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
     speech_config.speech_recognition_language = "en-US"
-    audio_config = speech.audio.AudioConfig(filename=filename)
+
+    if filename:
+        audio_config = speech.audio.AudioConfig(filename=filename)
+    elif content:
+        # TODO: is this right? who knows
+        stream = speech.audio.PushAudioInputStream()
+        stream.write(content)
+        audio_config = speech.audio.AudioConfig(stream=stream)
+    else:
+        raise ValueError("Must provide filename or content")
 
     recognizer = speech.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 

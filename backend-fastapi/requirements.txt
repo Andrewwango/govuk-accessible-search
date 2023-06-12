@@ -1,0 +1,5 @@
+azure-cognitiveservices-speech
+fastapi
+openai
+pydantic
+python-multipart
