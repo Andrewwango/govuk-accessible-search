@@ -45,9 +45,9 @@ def test_speech_to_text(backend_url: str):
         print()
     except typer.Abort:
         typer.echo("Exiting...")
-        break
     except Exception as e:
         typer.echo(f"Error: {e}")
+        test_speech_to_text(backend_url)
 
 
 @app.command()
