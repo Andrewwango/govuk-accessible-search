@@ -79,14 +79,17 @@ Note that the CSS file is only needed to import styles for the Government Design
 #### Build
 This uses a custom build process in `component/build.sh`. First the Javascript, along with its dependencies, is bundled into a single script using `webpack`. Then HTML (and CSS) are copied across. Finally, all Javascripts are copied into the HTML as inline scripts (very hacky), allowing the component to be embedded in one line.
 
-### Deploy backend
+### Deploy backend (Azure Functions)
 
 **To Deploy Locally**
 
 Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
 
 ```
-cd backend
+rm -r temp/
+cp -r backend-functions/ temp/
+cp -r backend-shared/ temp/
+cd temp/
 pip install -r requirements.txt
 func start
 ```
@@ -94,11 +97,16 @@ func start
 **To Deploy to Azure**
 
 ```
-cd backend
-func azure functionapp publish shwast-fun-app
+bash deploy-functions.sh
 ```
 
-(if using a different function app, replace `shwast-fun-app` with the new name)
+(if using a different function app, set `FUNCTION_APP` variable with the new name)
+
+### Deploy backend (Container Instance)
+
+```
+bash deploy-container.sh
+```
 
 ### Test backend
 
