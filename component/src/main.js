@@ -25,6 +25,12 @@ document
 		}
 
 		document.getElementById("search-result").style.display = "block"
+
+		const ttsAudio = await callTTSBackend(outputElement.innerHTML)
+
+		const audioPlayer = document.getElementById("audio-player")
+		audioPlayer.src = `data:audio/wav;base64,${ttsAudio}`
+		audioPlayer.play()
 	})
 
 document
@@ -156,4 +162,20 @@ async function callSelectRelevantSectionBackend(query, headings) {
 	console.log(`Headings: ${headings.map((x) => x.heading)}`)
 	console.log(`Output: ${outputObject.heading}`)
 	return outputObjectUrl
+}
+
+async function callTTSBackend(text) {
+	const response = await fetch(`${BACKEND_URL}/text-to-speech`, {
+		method: "post",
+		headers: {
+			"Content-type": "application/json",
+		},
+		body: JSON.stringify({
+			text: text,
+		}),
+	})
+	const responseJson = await response.json()
+	const output = responseJson["output"]
+
+	return output
 }
