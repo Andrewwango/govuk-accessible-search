@@ -4,6 +4,7 @@ const htmlToText = require("html-to-text")
 // Constants
 const BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api"
 const FIND_MOST_RELEVANT_SECTION = true
+const CURRENT_PAGE_HEADING = "CURRENT PAGE"
 
 // Global variables
 let scrapedText = ""
@@ -41,22 +42,24 @@ async function handleSearch(query) {
 
 	const scrapedHeadings = scrapeHeadings(relevantPageRawHtml)
 
-	const mostRelevantHeadingUrl = FIND_MOST_RELEVANT_SECTION
+	const mostRelevantHeading = FIND_MOST_RELEVANT_SECTION
 		? await callSelectRelevantSectionBackend(query, scrapedHeadings)
-		: "CURRENT PAGE"
-
+		: {heading: CURRENT_PAGE_HEADING, url: ""}
 
     // Issue #17: persist the below to save time in a session
-	if (mostRelevantHeadingUrl != "") {
+	if (mostRelevantHeading.url != "") {
 		relevantPageRawHtml = await getExternalPageRawHtml(
-			mostRelevantHeadingUrl
+			mostRelevantHeading.url
 		)
 	}
 
 	scrapedText = parseGovTextFromHtml(relevantPageRawHtml)
 
 	const answer = await callQueryBackend(scrapedText, query)
-	return answer
+
+	const result = formatSearchResult(answer, mostRelevantHeading)
+
+	return result
 }
 
 function getCurrentPageRawHtml() {
@@ -86,7 +89,7 @@ function scrapeHeadings(rawHtml) {
 		.split("\n")
 		.map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/g))
 		.filter((x) => x.length > 1)
-		.concat([["", "CURRENT PAGE"]])
+		.concat([["", CURRENT_PAGE_HEADING]])
 		.map((x) => {
 			return {
 				heading: x[1].trim(),
@@ -111,6 +114,11 @@ function parseGovTextFromHtml(rawHtml) {
 		],
 	})
 	return prettyText
+}
+
+function formatSearchResult(answer, relevantHeading) {
+	const citation = (relevantHeading.heading == CURRENT_PAGE_HEADING) ? "the current page" : `<a href="${relevantHeading.url}" target="_blank">${relevantHeading.heading}</a>`
+	return `${answer}<br><small><i>The information above has been taken from ${citation}</i></small>.`
 }
 
 async function callQueryBackend(context, query) {
@@ -147,13 +155,13 @@ async function callSelectRelevantSectionBackend(query, headings) {
 	const responseJson = await response.json()
 	const output = responseJson["output"].replace(/\./g, "")
 
-	const outputObject = headings.find(function (item) {
+	let outputObject = headings.find(function (item) {
 		return item.heading === output
 	})
-	const outputObjectUrl = outputObject ? outputObject.url : ""
+	outputObject = outputObject ? outputObject: {heading: CURRENT_PAGE_HEADING, url: ""}
 
 	console.log(`Query: ${query}`)
 	console.log(`Headings: ${headings.map((x) => x.heading)}`)
 	console.log(`Output: ${outputObject.heading}`)
-	return outputObjectUrl
+	return outputObject
 }
