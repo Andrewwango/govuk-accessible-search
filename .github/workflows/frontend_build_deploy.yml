@@ -29,9 +29,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.15.0'
-      - run: yarn
-      - run: cd component && yarn build
-      - run: cd ../demo && yarn build
+      - run: cd component && yarn install && yarn build
+      - run: cd ../demo && yarn install && yarn build
   deploy:
     environment:
       name: github-pages
