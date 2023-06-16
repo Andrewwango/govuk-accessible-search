@@ -42,12 +42,9 @@ jobs:
         run: cd demo && yarn install && yarn build
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v3
-      - name: pwd
-        run: pwd
-      - name: Upload artifact
+      - name: Upload repository
         uses: actions/upload-pages-artifact@v1
         with:
-          # Upload entire repository
           path: '.'
   deploy:
     environment:
