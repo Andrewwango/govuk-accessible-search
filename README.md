@@ -47,7 +47,7 @@ A demo of the component in action on a sample GOV.UK website can be viewed [live
 
 ## Developer guide
 
-### Add component to demo
+### Add component to a new demo
 
 1. Download a GOV.UK website. Here's an example using the website describing [France foreign travel advice](https://www.gov.uk/foreign-travel-advice/france/entry-requirements):
 
@@ -67,17 +67,23 @@ cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --
 
 Note: to use on a NHS webpage, instead include `component/index_nhs.html` which has all GOV.UK tags replaced with their NHS.UK counterparts.
 
-### Build component
+### Build component locally
 
 Note that the CSS file is only needed to import styles for the Government Design System components, and the assets (images and fonts) are those included with GDS following this [tutorial](https://frontend.design-system.service.gov.uk/get-started/#4-get-the-font-and-images-working).
 
-- Get started locally: `npm i yarn`, `yarn install`, `pip install beautifulsoup4` (for build process only)
+- Get started locally: `cd component`, `npm i yarn`, `yarn install`, `pip install beautifulsoup4` (for build process only)
 - Build: `yarn build` (see below)
 - Run site locally: `yarn test` (using `live-server`)
 - Recompile SASS (only if needed): `yarn sass style.scss src/index.css`
 
-#### Build
+#### Build info
 This uses a custom build process in `component/build.sh`. First the Javascript, along with its dependencies, is bundled into a single script using `webpack`. Then HTML (and CSS) are copied across. Finally, all Javascripts are copied into the HTML as inline scripts (very hacky), allowing the component to be embedded in one line.
+
+### Build demo locally
+
+- Get started locally: `cd demo`, `npm i yarn`, `yarn install`
+- Build: `yarn build`
+- Run site locally: `yarn test`
 
 ### Deploy backend
 

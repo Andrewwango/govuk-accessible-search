@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "live-server dist",
-    "install-component": "mkdir -p component && curl https://raw.githubusercontent.com/Andrewwango/gds-accessible-search/main/component/dist/index.html -o component/index.html",
+    "install-component": "mkdir -p component && cp ../component/dist/index.html component/index.html && cp ../component/dist/index_nhs.html component/index_nhs.html",
     "compile-nunjucks": "mkdir -p dist && nunjucks-to-html 'www.gov.uk/**/*.html' 'www.nhs.uk/**/*.html' --dest dist ",
     "copy-gov-assets": "cp -R 'www.gov.uk/assets' 'dist/www.gov.uk/assets'",
     "copy-nhs-assets": "cp -R 'www.nhs.uk/static' 'dist/www.nhs.uk/static'",
