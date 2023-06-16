@@ -40,14 +40,7 @@ jobs:
         run: cd component && yarn install && yarn build
       - name: Build demo
         run: cd demo && yarn install && yarn build
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Setup Pages
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v3
       - name: pwd
         run: pwd
@@ -56,6 +49,13 @@ jobs:
         with:
           # Upload entire repository
           path: '.'
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
