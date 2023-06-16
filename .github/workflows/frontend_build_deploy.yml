@@ -26,11 +26,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: '18.15.0'
-      - run: cd component && yarn install && yarn build
-      - run: cd ../demo && yarn install && yarn build
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install Python dependencies for component build
+        run: python -m pip install beautifulsoup4
+      - name: Build component
+        run: cd component && yarn install && yarn build
+      - name: Build demo
+        run: cd ../demo && yarn install && yarn build
   deploy:
     environment:
       name: github-pages
