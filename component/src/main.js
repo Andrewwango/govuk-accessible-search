@@ -16,15 +16,17 @@ document
 		if (inputElement.value == "") {
 			return
 		}
+		
+		document.getElementById("search-result").style.display = "block"
+		
 		try {
+			outputElement.innerHTML = "Thinking..."
 			outputElement.innerHTML = await handleSearch(inputElement.value)
 		} catch (err) {
 			console.log(err)
 			outputElement.innerHTML =
 				"Unknown error occured. Please try again later."
 		}
-
-		document.getElementById("search-result").style.display = "block"
 	})
 
 document
