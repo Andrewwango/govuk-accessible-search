@@ -1,4 +1,4 @@
-# gds-accessible-search
+# govuk-accessible-search
 An intelligent search bar to improve accessibility on GOV.UK/NHS.UK pages using OpenAI. 
 
 Kainos OpenAI submission for SHWAST (Beenita Shah, Oliver Stanley, Andrew Wang).
@@ -19,7 +19,7 @@ These questions could be for example:
 
 We have built a tool that can answer natural-language questions on any government webpage. Our solution consists of 3 parts:
 
-1. [Frontend component contained in one file](https://andrewwango.github.io/gds-accessible-search/component/dist/index.html) which performs all the logic client-side.
+1. [Frontend component contained in one file](https://andrewwango.github.io/govuk-accessible-search/component/dist/index.html) which performs all the logic client-side.
 2. We use a micro-backend to route API calls to an OpenAI API securely, without exposing our OpenAI API key to the frontend. This is deployed serverlessly.
 3. Demo of a government website with the component inserted using Nunjucks, deployed statically to Github Pages
 
@@ -43,7 +43,7 @@ at the desired location. Then build your website how you normally would. This em
 
 ## Live demo
 
-A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
+A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
 
 ## Developer guide
 
