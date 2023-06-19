@@ -50,7 +50,7 @@ def perform_speech_to_text(filename: str) -> dict:
             "output": ""
         }
     if result.reason == speech.ResultReason.Canceled:
-        error_message = "Error in speech synthesis"
+        error_message = "Error in speech transcription"
         cancellation_details = result.cancellation_details
         if cancellation_details.reason == speech.CancellationReason.Error:
             error_message = "Error details: {}".format(cancellation_details.error_details)
