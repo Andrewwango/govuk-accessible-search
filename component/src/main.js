@@ -31,11 +31,10 @@ document
 
 		document.getElementById("search-result").style.display = "block"
 
-		const ttsAudio = await callTTSBackend(outputElement.innerHTML)
+		const ttsAudio = await callTTSBackend(outputElement.innerHTML.split("<br>")[0])
 
 		const audioPlayer = document.getElementById("audio-player")
-		audioPlayer.src = `data:audio/wav;base64,${ttsAudio}`
-		audioPlayer.play()
+		audioPlayer.src = `data:audio/mp3;base64,${ttsAudio}`
 	})
 
 document
