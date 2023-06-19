@@ -51,12 +51,17 @@ document
 	})
 
 async function handleSearch(query) {
+	 // Don't persist the following as this is very fast
 	let relevantPageRawHtml = getCurrentPageRawHtml()
-
-	const scrapedHeadings = scrapeHeadings(relevantPageRawHtml) //don't persist these as this is very fast
+	const scrapedHeadings = scrapeHeadings(relevantPageRawHtml)
+	
+	// This is only used for context for select relevant section, and is not cached.
+	// However if this requires some slow NLP in future, this will require read/write 
+	// to cache hopefully using the same cache as below
+	const currentPagePrettyText =  parseGovTextFromHtml(relevantPageRawHtml) 
 
 	const mostRelevantHeading = FIND_MOST_RELEVANT_SECTION
-		? await callSelectRelevantSectionBackend(query, scrapedHeadings)
+		? await callSelectRelevantSectionBackend(query, scrapedHeadings, currentPagePrettyText)
 		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
 	let mostRelevantPage = JSON.parse(sessionStorage["scrapedPages"])[window.location.href]?.[mostRelevantHeading.url]
@@ -169,7 +174,7 @@ async function callQueryBackend(context, query) {
 	return output
 }
 
-async function callSelectRelevantSectionBackend(query, headings) {
+async function callSelectRelevantSectionBackend(query, headings, context="") {
 	const response = await fetch(`${BACKEND_URL}/select-relevant-section`, {
 		method: "post",
 		headers: {
@@ -178,6 +183,7 @@ async function callSelectRelevantSectionBackend(query, headings) {
 		body: JSON.stringify({
 			options: Object.keys(headings),
 			query: query,
+			context: context
 		}),
 	})
 	const responseJson = await response.json()
