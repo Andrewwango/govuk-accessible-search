@@ -9,12 +9,16 @@ const CURRENT_PAGE_HEADING = "CURRENT PAGE"
 /* Initialise cache for text in scraped pages. 
 sessionStorage stores throughout a browser session whereas 
 localStorage persists across browser sessions.
-Each page is represented by an object {
-	url // relative URL from this page
-	prettyText // text content of this page
-	summary // potentially store GPT-summarised text
-} */
-sessionStorage["scrapedPages"] = sessionStorage["scrapedPages"] || "[]"
+Pages are represented by an object {
+	location: { // the current page
+		url: { // relative URL of a page
+			prettyText: // text content of this page,
+			summary: // potentially store GPT-summarised text
+		},
+	}
+} 
+Note this could be made more efficient in the future*/
+sessionStorage["scrapedPages"] = sessionStorage["scrapedPages"] || "{}"
 
 document
 	.getElementById("search-button")
@@ -55,9 +59,7 @@ async function handleSearch(query) {
 		? await callSelectRelevantSectionBackend(query, scrapedHeadings)
 		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
-	let mostRelevantPage = JSON.parse(sessionStorage["scrapedPages"]).find(
-		(x) => x.url === mostRelevantHeading.url
-	)
+	let mostRelevantPage = JSON.parse(sessionStorage["scrapedPages"])[window.location.href]?.[mostRelevantHeading.url]
 
 	if (!mostRelevantPage) {
 		console.log(`Scraping ${mostRelevantHeading.heading}...`)
@@ -68,14 +70,15 @@ async function handleSearch(query) {
 				: await getExternalPageRawHtml(mostRelevantHeading.url)
 
 		mostRelevantPage = {
-			url: mostRelevantHeading.url,
-			prettyText: parseGovTextFromHtml(relevantPageRawHtml),
-			summary: "",
-		}
+				prettyText: parseGovTextFromHtml(relevantPageRawHtml),
+				summary: "",
+			}
 		
-		sessionStorage["scrapedPages"] = JSON.stringify(
-			JSON.parse(sessionStorage["scrapedPages"]).concat(mostRelevantPage)
-		)
+		const storage = JSON.parse(sessionStorage["scrapedPages"])
+		storage[window.location.href] ||= {}
+		storage[window.location.href][mostRelevantHeading.url] = mostRelevantPage
+
+		sessionStorage["scrapedPages"] = JSON.stringify(storage)
 	}
 
 	const answer = await callQueryBackend(mostRelevantPage.prettyText, query)
@@ -111,12 +114,13 @@ function scrapeHeadings(rawHtml) {
 		.map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/g))
 		.filter((x) => x.length > 1)
 		.concat([["", CURRENT_PAGE_HEADING]])
-		.map((x) => {
-			return {
-				heading: x[1].trim(),
-				url: x.length < 3 ? "" : x[2].replace(/[\[\]]/g, ""),
-			}
-		})
+		.reduce(
+			(acc, x) => ({
+				...acc,
+				[x[1].trim()]: x.length < 3 ? "" : x[2].replace(/[\[\]]/g, "")
+			}),
+			{}
+		)
 
 	return headingsList
 }
@@ -172,20 +176,19 @@ async function callSelectRelevantSectionBackend(query, headings) {
 			"Content-type": "application/json",
 		},
 		body: JSON.stringify({
-			options: headings.map((x) => x.heading),
+			options: Object.keys(headings),
 			query: query,
 		}),
 	})
 	const responseJson = await response.json()
-	const output = responseJson["output"].replace(/\./g, "")
+	const heading = responseJson["output"].replace(/\./g, "")
 
-	let outputObject = headings.find((x) => x.heading === output)
-	outputObject = outputObject
-		? outputObject
+	const output = headings[heading]
+		? { heading: heading, url: headings[heading] }
 		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
 	console.log(`Query: ${query}`)
-	console.log(`Headings: ${headings.map((x) => x.heading)}`)
-	console.log(`Output: ${outputObject.heading}`)
-	return outputObject
+	console.log(`Headings: ${Object.keys(headings)}`)
+	console.log(`Output: ${output.heading}`)
+	return output
 }
