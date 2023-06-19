@@ -63,6 +63,7 @@ def perform_speech_to_text(filename: str) -> dict:
 
 def perform_text_to_speech(text: str) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
+    speech_config.set_speech_synthesis_output_format(speech.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
     speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
 
     synthesizer = speech.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
