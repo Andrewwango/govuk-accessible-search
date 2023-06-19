@@ -47,8 +47,9 @@ def action_select_relevant_section(request: func.HttpRequest) -> func.HttpRespon
 
     history = preprocessing.preprocess_history(parameters.get("history", []))
     query = preprocessing.preprocess_query(parameters["query"])
+    context = preprocessing.preprocess_context(parameters.get("context", ""))
 
-    prompt = prompts.construct_select_prompt(parameters["options"], query)
+    prompt = prompts.construct_select_prompt(parameters["options"], context, query)
 
     response_dict = services.perform_chat_completion(history, prompt, parameters, max_tokens=16)
 
