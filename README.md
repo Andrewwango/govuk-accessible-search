@@ -1,4 +1,4 @@
-# gds-accessible-search
+# govuk-accessible-search
 An intelligent search bar to improve accessibility on GOV.UK/NHS.UK pages using OpenAI. 
 
 Kainos OpenAI submission for SHWAST (Beenita Shah, Oliver Stanley, Andrew Wang).
@@ -19,7 +19,7 @@ These questions could be for example:
 
 We have built a tool that can answer natural-language questions on any government webpage. Our solution consists of 3 parts:
 
-1. [Frontend component contained in one file](https://andrewwango.github.io/gds-accessible-search/component/dist/index.html) which performs all the logic client-side.
+1. [Purely frontend component contained in one file](https://andrewwango.github.io/govuk-accessible-search/component/dist/index.html) which performs all the logic client-side.
 2. We use a micro-backend to route API calls to an OpenAI API securely, without exposing our OpenAI API key to the frontend. This is deployed serverlessly.
 3. Demo of a government website with the component inserted using Nunjucks, deployed statically to Github Pages
 
@@ -29,9 +29,13 @@ Our solution will provide the following functionality:
 - Lightweight: all processing is done client-side and the backend contains no program logic
 - Multilingual: ask a question and receive an answer in any language, using ChatGPT's multilingual capabilities
 
-## Usage
+## 1. Live demo
 
-To use our component on your government webpage, simply copy the component HTML file from `component/dist/index.html` and insert the component using a Nunjucks `include`:
+A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
+
+## 2. Usage
+
+To use our component on your government webpage, simply [build the component locally](#31-build-component-locally), copy the component HTML file from `component/dist/index.html` and insert the component using a Nunjucks `include`:
 
 <!-- {% raw %} -->
 ```html
@@ -41,13 +45,25 @@ To use our component on your government webpage, simply copy the component HTML 
 
 at the desired location. Then build your website how you normally would. This embeds the component HTML along with all javascripts. CSS is not needed as the GOV.UK website will already have the necessary CSS.
 
-## Live demo
+## 3. Developer guide
 
-A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/gds-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
+### 3.1 Build component locally
 
-## Developer guide
+Note that the CSS file is only needed to import styles for the Government Design System components, and the assets (images and fonts) are those included with GDS following this [tutorial](https://frontend.design-system.service.gov.uk/get-started/#4-get-the-font-and-images-working).
 
-### Add component to demo
+- Get started locally: `cd component`, `npm i yarn`, `yarn install`, `pip install beautifulsoup4` (for build process only)
+- Build: `yarn build`
+- Run site locally: `yarn test` (uses `live-server`)
+
+This uses a custom build process in `component/build.sh`. First the Javascript, along with its dependencies, is bundled into a single script using `webpack`. Then HTML (and CSS) are copied across. Finally, all Javascripts are copied into the HTML as inline scripts (very hacky), allowing the component to be embedded in one line. You shouldn't ever have to touch the CSS as any GOV.UK website will already have the necessary CSS; however, if needed, recompile SASS with `yarn sass style.scss src/index.css`.
+
+### 3.2 Build demo locally
+
+- Get started locally: `cd demo`, `npm i yarn`, `yarn install`
+- Build: `yarn build`
+- Run site locally: `yarn test`
+
+### 3.3 Add component to a new demo
 
 1. Download a GOV.UK website. Here's an example using the website describing [France foreign travel advice](https://www.gov.uk/foreign-travel-advice/france/entry-requirements):
 
@@ -55,7 +71,7 @@ A demo of the component in action on a sample GOV.UK website can be viewed [live
 cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --no-parent --no-check-certificate https://www.gov.uk/foreign-travel-advice/france
 ```
 
-2. Add component anywhere in the website HTML using a Nunjucks include: 
+2. [Build the component locally](#31-build-component-locally), and then add component anywhere in the website HTML using a Nunjucks include: 
 
 <!-- {% raw %} -->
 ```html
@@ -63,25 +79,18 @@ cd demo && wget --mirror --convert-links --adjust-extension --page-requisites --
 ```
 <!-- {% endraw %} -->
 
-3. Build the site using `yarn install && yarn build` and optionally run locally using `yarn test`.
+3. [Build your demo site locally](#32-build-demo-locally) and view it in your browser. Alternatively, build your Nunjucks site how you normally would.
 
 Note: to use on a NHS webpage, instead include `component/index_nhs.html` which has all GOV.UK tags replaced with their NHS.UK counterparts.
 
-### Build component
+### 3.4 Deploy demo
 
-Note that the CSS file is only needed to import styles for the Government Design System components, and the assets (images and fonts) are those included with GDS following this [tutorial](https://frontend.design-system.service.gov.uk/get-started/#4-get-the-font-and-images-working).
+The component and demo frontends in this repo are configured to be remotely built and deployed to GitHub Pages for free. The remote build process simply follows the build instructions in Sections [3.1](#31-build-component-locally) and [3.2](#32-build-demo-locally).
 
-- Get started locally: `npm i yarn`, `yarn install`, `pip install beautifulsoup4` (for build process only)
-- Build: `yarn build` (see below)
-- Run site locally: `yarn test` (using `live-server`)
-- Recompile SASS (only if needed): `yarn sass style.scss src/index.css`
-
-#### Build
-This uses a custom build process in `component/build.sh`. First the Javascript, along with its dependencies, is bundled into a single script using `webpack`. Then HTML (and CSS) are copied across. Finally, all Javascripts are copied into the HTML as inline scripts (very hacky), allowing the component to be embedded in one line.
-
-### Deploy backend (Azure Functions)
+### 3.5 Deploy backend
 
 **To Deploy Locally**
+#### 3.5.1 To Deploy Locally
 
 Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
 
@@ -94,7 +103,7 @@ pip install -r requirements.txt
 func start
 ```
 
-**To Deploy to Azure**
+#### 3.5.2 To Deploy to Azure Functions
 
 ```
 bash deploy-functions.sh
@@ -102,13 +111,13 @@ bash deploy-functions.sh
 
 (if using a different function app, set `FUNCTION_APP` variable with the new name)
 
-### Deploy backend (Container Instance)
+#### 3.5.3 To Deploy to Azure Container Instance
 
 ```
 bash deploy-container.sh
 ```
 
-### Test backend
+### 3.6 Test backend
 
 Use the text client.
 

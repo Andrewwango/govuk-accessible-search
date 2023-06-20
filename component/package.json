@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "test": "live-server dist",
-    "build": "zsh build.sh"
+    "build": "chmod +x build.sh && ./build.sh"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "2.8.3",
