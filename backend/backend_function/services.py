@@ -19,10 +19,12 @@ AZURE_SPEECH_REGION = os.getenv("AZURE_SPEECH_REGION")
 
 AZURE_LANGUAGE_KEY = os.getenv("AZURE_LANGUAGE_KEY")
 AZURE_LANGUAGE_ENDPOINT = os.getenv("AZURE_LANGUAGE_ENDPOINT")
-AZURE_LANGUAGE_CREDENTIAL = AzureKeyCredential(AZURE_LANGUAGE_KEY)
-AZURE_LANGUAGE_CLIENT = TextAnalyticsClient(endpoint=AZURE_LANGUAGE_ENDPOINT, credential=AZURE_LANGUAGE_KEY)
 
 LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.1"))
+
+available_voices: list[speech.VoiceInfo] = speech.SpeechSynthesizer(
+    speech_config=speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION), audio_config=None
+).get_voices_async().get().voices
 
 
 def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
@@ -69,17 +71,29 @@ def perform_speech_to_text(filename: str) -> dict:
 
 
 def perform_language_recognition(text: str) -> str:
-    documents = [text]
-    response = AZURE_LANGUAGE_CLIENT.detect_language(documents=documents)[0]
-    return response.primary_language.name
+    credential = AzureKeyCredential(AZURE_LANGUAGE_KEY)
+    client = TextAnalyticsClient(endpoint=AZURE_LANGUAGE_ENDPOINT, credential=credential)
+    response = client.detect_language(documents=[text])[0]
+    language_obj = response.primary_language
+    return language_obj.iso6391_name
 
 
-def perform_text_to_speech(text: str) -> dict:
+def perform_text_to_speech(text: str, lang: str = "en") -> dict:
+    if lang == "auto":
+        try:
+            lang = perform_language_recognition(text)
+        except Exception:
+            lang = "en"
+
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
     speech_config.set_speech_synthesis_output_format(speech.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
-    speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
-
     synthesizer = speech.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
+
+    for voice in available_voices:
+        if lang in voice.locale:
+            # this isn't a good way of doing it but there are many voices per lang so it's not clear what a better way is
+            speech_config.speech_synthesis_voice_name = voice.name
+            break
 
     result = synthesizer.speak_text_async(text).get()
 
