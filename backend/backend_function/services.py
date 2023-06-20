@@ -78,7 +78,7 @@ def perform_language_recognition(text: str) -> str:
     return language_obj.iso6391_name
 
 
-def perform_text_to_speech(text: str, lang: str = "en") -> dict:
+def perform_text_to_speech(text: str, lang: str = "auto") -> dict:
     if lang == "auto":
         try:
             lang = perform_language_recognition(text)
