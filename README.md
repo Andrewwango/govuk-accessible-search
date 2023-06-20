@@ -89,7 +89,6 @@ The component and demo frontends in this repo are configured to be remotely buil
 
 ### 3.5 Deploy backend
 
-**To Deploy Locally**
 #### 3.5.1 To Deploy Locally
 
 Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
