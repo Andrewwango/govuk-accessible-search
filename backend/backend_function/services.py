@@ -1,7 +1,9 @@
 import base64
 import os
 
+from azure.ai.textanalytics import TextAnalyticsClient
 from azure.cognitiveservices import speech
+from azure.core.credentials import AzureKeyCredential
 import openai
 
 openai.api_type = "azure"
@@ -14,6 +16,11 @@ OPENAI_GPT_DEPLOYMENT = os.getenv("OPENAI_GPT_DEPLOYMENT")
 
 AZURE_SPEECH_KEY = os.getenv("AZURE_SPEECH_KEY")
 AZURE_SPEECH_REGION = os.getenv("AZURE_SPEECH_REGION")
+
+AZURE_LANGUAGE_KEY = os.getenv("AZURE_LANGUAGE_KEY")
+AZURE_LANGUAGE_ENDPOINT = os.getenv("AZURE_LANGUAGE_ENDPOINT")
+AZURE_LANGUAGE_CREDENTIAL = AzureKeyCredential(AZURE_LANGUAGE_KEY)
+AZURE_LANGUAGE_CLIENT = TextAnalyticsClient(endpoint=AZURE_LANGUAGE_ENDPOINT, credential=AZURE_LANGUAGE_KEY)
 
 LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.1"))
 
@@ -59,6 +66,12 @@ def perform_speech_to_text(filename: str) -> dict:
     return {
         "output": result.text
     }
+
+
+def perform_language_recognition(text: str) -> str:
+    documents = [text]
+    response = AZURE_LANGUAGE_CLIENT.detect_language(documents=documents)[0]
+    return response.primary_language.name
 
 
 def perform_text_to_speech(text: str) -> dict:
