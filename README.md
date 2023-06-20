@@ -89,18 +89,23 @@ The component and demo frontends in this repo are configured to be remotely buil
 
 ### 3.5 Deploy backend
 
-#### 3.5.1 To Deploy Locally
+#### 3.5.1 To Deploy Locally as an Azure Function
 
-Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
+Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Then ensure you have a Python virtual environment with all requirements activated. This can be set up as follows:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r backend-functions/requirements.txt
+```
+
+Then run the local deployment script.
 
 ```
-rm -r temp/
-cp -r backend-functions/ temp/
-cp -r backend-shared/ temp/
-cd temp/
-pip install -r requirements.txt
-func start
+bash deploy-local.sh
 ```
+
+Once finishes, the created `temp/` directory can be safely deleted.
 
 #### 3.5.2 To Deploy to Azure Functions
 
