@@ -1,4 +1,5 @@
 import base64
+import logging
 import os
 
 from azure.ai.textanalytics import TextAnalyticsClient
@@ -83,6 +84,7 @@ def perform_text_to_speech(text: str, lang: str = "auto") -> dict:
         try:
             lang = perform_language_recognition(text)
         except Exception:
+            logging.warning("Exception when recognising language, defaulting to 'en'...")
             lang = "en"
 
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
