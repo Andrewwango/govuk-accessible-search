@@ -6,8 +6,19 @@ const BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api"
 const FIND_MOST_RELEVANT_SECTION = true
 const CURRENT_PAGE_HEADING = "CURRENT PAGE"
 
-// Global variables
-let scrapedText = ""
+/* Initialise cache for text in scraped pages. 
+sessionStorage stores throughout a browser session whereas 
+localStorage persists across browser sessions.
+Pages are represented by an object {
+	location: { // the current page
+		url: { // relative URL of a page
+			prettyText: // text content of this page,
+			summary: // potentially store GPT-summarised text
+		},
+	}
+} 
+Note this could be made more efficient in the future*/
+sessionStorage["scrapedPages"] = sessionStorage["scrapedPages"] || "{}"
 
 document
 	.getElementById("search-button")
@@ -17,9 +28,9 @@ document
 		if (inputElement.value == "") {
 			return
 		}
-		
+
 		document.getElementById("search-result").style.display = "block"
-		
+
 		try {
 			outputElement.innerHTML = "Thinking..."
 			outputElement.innerHTML = await handleSearch(inputElement.value)
@@ -44,28 +55,44 @@ document
 	})
 
 async function handleSearch(query) {
+	 // Don't persist the following as this is very fast
 	let relevantPageRawHtml = getCurrentPageRawHtml()
-
 	const scrapedHeadings = scrapeHeadings(relevantPageRawHtml)
+	
+	// This is only used for context for select relevant section, and is not cached.
+	// However if this requires some slow NLP in future, this will require read/write 
+	// to cache hopefully using the same cache as below
+	const currentPagePrettyText =  parseGovTextFromHtml(relevantPageRawHtml) 
 
 	const mostRelevantHeading = FIND_MOST_RELEVANT_SECTION
-		? await callSelectRelevantSectionBackend(query, scrapedHeadings)
-		: {heading: CURRENT_PAGE_HEADING, url: ""}
+		? await callSelectRelevantSectionBackend(query, scrapedHeadings, currentPagePrettyText)
+		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
-    // Issue #17: persist the below to save time in a session
-	if (mostRelevantHeading.url != "") {
-		relevantPageRawHtml = await getExternalPageRawHtml(
-			mostRelevantHeading.url
-		)
+	let mostRelevantPage = JSON.parse(sessionStorage["scrapedPages"])[window.location.href]?.[mostRelevantHeading.url]
+
+	if (!mostRelevantPage) {
+		console.log(`Scraping ${mostRelevantHeading.heading}...`)
+
+		relevantPageRawHtml =
+			mostRelevantHeading.url == ""
+				? relevantPageRawHtml
+				: await getExternalPageRawHtml(mostRelevantHeading.url)
+
+		mostRelevantPage = {
+				prettyText: parseGovTextFromHtml(relevantPageRawHtml),
+				summary: "",
+			}
+		
+		const storage = JSON.parse(sessionStorage["scrapedPages"])
+		storage[window.location.href] ||= {}
+		storage[window.location.href][mostRelevantHeading.url] = mostRelevantPage
+
+		sessionStorage["scrapedPages"] = JSON.stringify(storage)
 	}
 
-	scrapedText = parseGovTextFromHtml(relevantPageRawHtml)
+	const answer = await callQueryBackend(mostRelevantPage.prettyText, query)
 
-	const answer = await callQueryBackend(scrapedText, query)
-
-	const result = formatSearchResult(answer, mostRelevantHeading)
-
-	return result
+	return formatSearchResult(answer, mostRelevantHeading)
 }
 
 function getCurrentPageRawHtml() {
@@ -96,12 +123,13 @@ function scrapeHeadings(rawHtml) {
 		.map((x) => x.split(/[*]|[0-9]+\.|[[]|[]]/g))
 		.filter((x) => x.length > 1)
 		.concat([["", CURRENT_PAGE_HEADING]])
-		.map((x) => {
-			return {
-				heading: x[1].trim(),
-				url: x.length < 3 ? "" : x[2].replace(/[\[\]]/g, ""),
-			}
-		})
+		.reduce(
+			(acc, x) => ({
+				...acc,
+				[x[1].trim()]: x.length < 3 ? "" : x[2].replace(/[\[\]]/g, "")
+			}),
+			{}
+		)
 
 	return headingsList
 }
@@ -123,7 +151,10 @@ function parseGovTextFromHtml(rawHtml) {
 }
 
 function formatSearchResult(answer, relevantHeading) {
-	const citation = (relevantHeading.heading == CURRENT_PAGE_HEADING) ? "the current page" : `<a href="${relevantHeading.url}" target="_blank">${relevantHeading.heading}</a>`
+	const citation =
+		relevantHeading.heading == CURRENT_PAGE_HEADING
+			? "the current page"
+			: `<a href="${relevantHeading.url}" target="_blank">${relevantHeading.heading}</a>`
 	return `${answer}<br><small><i>The information above has been taken from ${citation}</i></small>.`
 }
 
@@ -147,29 +178,29 @@ async function callQueryBackend(context, query) {
 	return output
 }
 
-async function callSelectRelevantSectionBackend(query, headings) {
+async function callSelectRelevantSectionBackend(query, headings, context="") {
 	const response = await fetch(`${BACKEND_URL}/select-relevant-section`, {
 		method: "post",
 		headers: {
 			"Content-type": "application/json",
 		},
 		body: JSON.stringify({
-			options: headings.map((x) => x.heading),
+			options: Object.keys(headings),
 			query: query,
+			context: context
 		}),
 	})
 	const responseJson = await response.json()
-	const output = responseJson["output"].replace(/\./g, "")
+	const heading = responseJson["output"].replace(/\./g, "")
 
-	let outputObject = headings.find(function (item) {
-		return item.heading === output
-	})
-	outputObject = outputObject ? outputObject: {heading: CURRENT_PAGE_HEADING, url: ""}
+	const output = headings[heading]
+		? { heading: heading, url: headings[heading] }
+		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
 	console.log(`Query: ${query}`)
-	console.log(`Headings: ${headings.map((x) => x.heading)}`)
-	console.log(`Output: ${outputObject.heading}`)
-	return outputObject
+	console.log(`Headings: ${Object.keys(headings)}`)
+	console.log(`Output: ${output.heading}`)
+	return output
 }
 
 async function callTTSBackend(text) {
