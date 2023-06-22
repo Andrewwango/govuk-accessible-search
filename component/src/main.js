@@ -29,12 +29,9 @@ document
 				"Unknown error occured. Please try again later."
 		}
 
-		document.getElementById("search-result").style.display = "block"
-
 		const ttsAudio = await callTTSBackend(outputElement.innerHTML.split("<br>")[0])
-
-		const audioPlayer = document.getElementById("audio-player")
-		audioPlayer.src = `data:audio/mp3;base64,${ttsAudio}`
+		document.getElementById("audio-player").style.display = "block"
+		document.getElementById("audio-player").src = `data:audio/mp3;base64,${ttsAudio}`
 	})
 
 document
@@ -176,6 +173,22 @@ async function callSelectRelevantSectionBackend(query, headings) {
 }
 
 async function callTTSBackend(text) {
+	const response = await fetch(`${BACKEND_URL}/text-to-speech`, {
+		method: "post",
+		headers: {
+			"Content-type": "application/json",
+		},
+		body: JSON.stringify({
+			text: text,
+		}),
+	})
+	const responseJson = await response.json()
+	const output = responseJson["output"]
+
+	return output
+}
+
+async function callSTTBackend(text) {
 	const response = await fetch(`${BACKEND_URL}/text-to-speech`, {
 		method: "post",
 		headers: {
