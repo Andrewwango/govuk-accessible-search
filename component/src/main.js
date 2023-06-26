@@ -6,6 +6,11 @@ const BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api"
 const FIND_MOST_RELEVANT_SECTION = true
 const CURRENT_PAGE_HEADING = "CURRENT PAGE"
 
+
+// Global variables
+let history = []
+
+
 /* Initialise cache for text in scraped pages. 
 sessionStorage stores throughout a browser session whereas 
 localStorage persists across browser sessions.
@@ -51,7 +56,8 @@ document
 	})
 
 async function handleSearch(query) {
-	 // Don't persist the following as this is very fast
+	// Don't persist the following as this is very fast
+
 	let relevantPageRawHtml = getCurrentPageRawHtml()
 	const scrapedHeadings = scrapeHeadings(relevantPageRawHtml)
 	
@@ -88,6 +94,11 @@ async function handleSearch(query) {
 
 	const answer = await callQueryBackend(mostRelevantPage.prettyText, query)
 
+	var dict = {}
+	dict.role = "user"
+	dict.content = query
+	history.push(dict)
+	
 	return formatSearchResult(answer, mostRelevantHeading)
 }
 
