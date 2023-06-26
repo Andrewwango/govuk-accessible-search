@@ -174,6 +174,7 @@ async function callQueryBackend(context, query) {
 		body: JSON.stringify({
 			context: context,
 			query: query,
+			history: history
 		}),
 	})
 
@@ -181,6 +182,7 @@ async function callQueryBackend(context, query) {
 	const output = responseJson["output"]
 	console.log(`Query: ${query}`)
 	console.log(`Context: ${context}`)
+	console.log(`History: ${history}`)
 	console.log(`Output: ${output}`)
 	return output
 }
