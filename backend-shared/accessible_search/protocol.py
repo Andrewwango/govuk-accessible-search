@@ -10,6 +10,7 @@ class ChatGPTRequest(pydantic.BaseModel):
 
 class SelectRelevantSectionRequest(pydantic.BaseModel):
     query: str
+    context: str = ""
     options: list[str]
     history: list[dict] = []
 

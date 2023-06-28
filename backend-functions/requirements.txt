@@ -6,3 +6,4 @@ azure-ai-textanalytics
 azure-cognitiveservices-speech
 azure-functions
 openai
+pydantic
