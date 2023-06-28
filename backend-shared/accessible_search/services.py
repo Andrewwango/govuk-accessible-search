@@ -21,21 +21,23 @@ AZURE_SPEECH_REGION = os.getenv("AZURE_SPEECH_REGION")
 AZURE_LANGUAGE_KEY = os.getenv("AZURE_LANGUAGE_KEY")
 AZURE_LANGUAGE_ENDPOINT = os.getenv("AZURE_LANGUAGE_ENDPOINT")
 
-LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.1"))
+LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.0"))
 
 available_voices: list[speech.VoiceInfo] = speech.SpeechSynthesizer(
     speech_config=speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION), audio_config=None
 ).get_voices_async().get().voices
 
 
-def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
+def perform_chat_completion(
+    history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
+) -> dict[str, str]:
     messages = history + [{"role": "user", "content": prompt}]
 
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
         messages=messages,
-        temperature=parameters.get("temperature", LLM_DEFAULT_TEMPERATURE),
+        temperature=temperature,
         **kwargs,
     )
 

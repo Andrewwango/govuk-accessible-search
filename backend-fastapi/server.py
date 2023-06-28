@@ -25,12 +25,11 @@ def query_chatgpt(parameters: protocol.ChatGPTRequest):
 def select_relevant_section(parameters: protocol.SelectRelevantSectionRequest):
     history = preprocessing.preprocess_history(parameters.history)
     query = preprocessing.preprocess_query(parameters.query)
+    context = preprocessing.preprocess_context(parameters.context)
 
-    prompt = prompts.construct_select_prompt(parameters.options, query)
+    prompt = prompts.construct_select_prompt(parameters.options, context, query)
 
-    response_dict = services.perform_chat_completion(
-        history, prompt, temperature=parameters.temperatrue, max_tokens=16
-    )
+    response_dict = services.perform_chat_completion(history, prompt, max_tokens=16)
 
     return protocol.TextOutputResponse(**response_dict)
 
