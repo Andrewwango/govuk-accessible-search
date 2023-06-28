@@ -64,7 +64,7 @@ def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
     with open(filename, "wb") as f:
         f.write(content)
 
-    response_dict = services.perform_speech_to_text(filename)
+    response_dict = services.perform_speech_to_text(filename=filename)
 
     return build_json_response(response_dict)
 
