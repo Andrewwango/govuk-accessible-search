@@ -1,5 +1,3 @@
-rm -r temp/
-cp -r backend-fastapi/ temp/
-cp -r backend-shared/ temp/
-cd temp/
+pip install backend-shared/
+cd backend-fastapi/
 python server.py

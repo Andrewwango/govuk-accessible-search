@@ -7,7 +7,7 @@ app = typer.Typer()
 
 
 @app.command()
-def main(backend_url: str = "https://shwast-fun-app.azurewebsites.net/api"):
+def main(backend_url: str = "http://localhost:7071/api"):
     action = typer.prompt("Action [chatgpt, select-relevant-section]")
     context = typer.prompt("Context").strip() if action == "chatgpt" else None
     options = typer.prompt("Options").strip() if action == "select-relevant-section" else None

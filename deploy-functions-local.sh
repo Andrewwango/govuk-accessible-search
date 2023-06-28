@@ -1,5 +1,3 @@
-rm -r temp/
-cp -r backend-functions/ temp/
-cp -r backend-shared/ temp/
-cd temp/
+pip install backend-shared/
+cd backend-functions/
 func start
