@@ -121,6 +121,8 @@ bash deploy-functions.sh
 bash deploy-container.sh
 ```
 
+You must also ensure `shwast-fun-app` resource is configured with the environment variables required (see `local.settings.json.example`).
+
 ### 3.6 Test backend
 
 Use the text client.

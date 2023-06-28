@@ -57,7 +57,7 @@ def test_speech_to_text(backend_url: str):
 
 @app.command()
 def main(backend_url: str = "https://shwast-fun-app.azurewebsites.net/api"):
-    test_speech_to_text(backend_url)
+    test_text_to_speech(backend_url)
 
 
 if __name__ == "__main__":
