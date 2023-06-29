@@ -94,12 +94,17 @@ async function handleSearch(query) {
 
 	const answer = await callQueryBackend(mostRelevantPage.prettyText, query)
 
-	var dict = {}
-	dict.role = "user"
-	dict.content = query
-	dict.role = "assistant"
-	dict.content = answer
-	history.push(dict)
+	var query_dict = {}
+	query_dict.role = "user"
+	query_dict.content = query
+	
+	var answer_dict = {}
+	answer_dict.role = "assistant"
+	answer_dict.content = answer
+
+
+	history.push(query_dict)
+	history.push(answer_dict)
 	
 	return formatSearchResult(answer, mostRelevantHeading)
 }
