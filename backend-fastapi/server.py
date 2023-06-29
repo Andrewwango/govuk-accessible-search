@@ -1,9 +1,11 @@
 import asyncio
 from collections import defaultdict
 from datetime import datetime, timedelta
+import json
 from typing import Annotated
 
 import fastapi
+from fastapi.responses import StreamingResponse
 import uvicorn
 
 from accessible_search import preprocessing, prompts, protocol, services
@@ -49,6 +51,27 @@ async def query_chatgpt(parameters: protocol.ChatGPTRequest):
     response_dict = await services.perform_chat_completion_async(history, prompt, temperature=parameters.temperature)
 
     return protocol.TextOutputResponse(**response_dict)
+
+
+@app.post("/api/chatgpt-stream")
+async def query_chatgpt_stream(parameters: protocol.ChatGPTRequest):
+    history = preprocessing.preprocess_history(parameters.history)
+    query = preprocessing.preprocess_query(parameters.query)
+    context = preprocessing.preprocess_context(parameters.context)
+
+    prompt = prompts.construct_query_prompt(context, query)
+
+    async def event_stream():
+        response_generator = services.perform_chat_completion_streaming(
+            history, prompt, temperature=parameters.temperature
+        )
+
+        async for result in response_generator:
+            yield {
+                "data": json.dumps(result) + "\n"
+            }
+
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
 @app.post("/api/select-relevant-section")

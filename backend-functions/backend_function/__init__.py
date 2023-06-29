@@ -13,6 +13,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     action_mapping: dict[str, Callable[[func.HttpRequest], func.HttpResponse]] = {
         "chatgpt": action_query_chatgpt,
+        "chatgpt-stream": action_query_chatgpt_stream,
         "select-relevant-section": action_select_relevant_section,
         "speech-to-text": action_speech_to_text,
         "text-to-speech": action_text_to_speech,
@@ -40,6 +41,10 @@ def action_query_chatgpt(request: func.HttpRequest) -> func.HttpResponse:
     response_dict = services.perform_chat_completion(history, prompt, temperature=parameters.temperature)
 
     return build_json_response(response_dict)
+
+
+def action_query_chatgpt_stream(request: func.HttpRequest) -> func.HttpResponse:
+    return func.HttpResponse("Streaming not implemented for Functions backend", status_code=501)
 
 
 def action_select_relevant_section(request: func.HttpRequest) -> func.HttpResponse:

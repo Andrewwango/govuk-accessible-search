@@ -1,6 +1,7 @@
 import base64
 import logging
 import os
+from typing import AsyncIterable
 
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.cognitiveservices import speech
@@ -66,6 +67,26 @@ async def perform_chat_completion_async(
     return {
         "output": output
     }
+
+
+async def perform_chat_completion_streaming(
+    history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
+) -> AsyncIterable[dict[str, str]]:
+    messages = history + [{"role": "user", "content": prompt}]
+
+    chat_completion = await openai.ChatCompletion.acreate(
+        deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=temperature,
+        stream=True,
+        **kwargs,
+    )
+
+    async for chunk in chat_completion:
+        yield {
+            "output": chunk["choices"][0]["delta"]
+        }
 
 
 def perform_speech_to_text(filename: str = None, content: bytes = None) -> dict:
