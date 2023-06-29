@@ -28,6 +28,10 @@ available_voices: list[speech.VoiceInfo] = speech.SpeechSynthesizer(
     speech_config=speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION), audio_config=None
 ).get_voices_async().get().voices
 
+# For Azure at-start recognition we can only use 4. We could up to 10 using continuous recognition
+# This may become irrelevant if we use frontend STT (Webkit Speech API) instead of Azure
+speech_to_text_languages = ["en-GB", "de-DE", "es-ES", "fr-FR"]
+
 
 def perform_chat_completion(
     history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
@@ -103,7 +107,11 @@ def perform_speech_to_text(filename: str = None, content: bytes = None) -> dict:
     else:
         raise ValueError("Must provide filename or content")
 
-    recognizer = speech.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+    detect_lang_config = speech.languageconfig.AutoDetectSourceLanguageConfig(languages=speech_to_text_languages)
+
+    recognizer = speech.SpeechRecognizer(
+        speech_config=speech_config, audio_config=audio_config, auto_detect_source_language_config=detect_lang_config
+    )
 
     result = recognizer.recognize_once_async().get()
 
