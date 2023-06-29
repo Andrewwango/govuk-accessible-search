@@ -1,3 +1,7 @@
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    load_dotenv()
+
 import asyncio
 from collections import defaultdict
 from datetime import datetime, timedelta

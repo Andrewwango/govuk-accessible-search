@@ -3,5 +3,6 @@ azure-cognitiveservices-speech
 fastapi
 openai
 pydantic
+python-dotenv
 python-multipart
 uvicorn
