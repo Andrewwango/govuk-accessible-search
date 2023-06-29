@@ -97,6 +97,8 @@ async function handleSearch(query) {
 	var dict = {}
 	dict.role = "user"
 	dict.content = query
+	dict.role = "assistant"
+	dict.content = answer
 	history.push(dict)
 	
 	return formatSearchResult(answer, mostRelevantHeading)
