@@ -48,6 +48,26 @@ def perform_chat_completion(
     }
 
 
+async def perform_chat_completion_async(
+    history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
+) -> dict[str, str]:
+    messages = history + [{"role": "user", "content": prompt}]
+
+    chat_completion = await openai.ChatCompletion.acreate(
+        deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=temperature,
+        **kwargs,
+    )
+
+    output = chat_completion.choices[0].message.content
+
+    return {
+        "output": output
+    }
+
+
 def perform_speech_to_text(filename: str = None, content: bytes = None) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
     speech_config.speech_recognition_language = "en-US"
