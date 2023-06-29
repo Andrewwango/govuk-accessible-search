@@ -1,5 +1,7 @@
+azure-ai-textanalytics
 azure-cognitiveservices-speech
 fastapi
 openai
 pydantic
 python-multipart
+uvicorn

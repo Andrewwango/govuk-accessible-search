@@ -1,0 +1,6 @@
+FROM python:3.10
+WORKDIR /app
+COPY ./backend-fastapi /app
+COPY ./backend-shared /app
+RUN pip install -r /app/requirements.txt --trusted-host pypi.org --trusted-host files.pythonhosted.org
+CMD ["uvicorn","server:app","--host", "0.0.0.0", "--port", "80"]
