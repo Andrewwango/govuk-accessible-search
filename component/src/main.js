@@ -1,15 +1,14 @@
 // Imports
 const htmlToText = require("html-to-text")
+const toWav = require("audiobuffer-to-wav")
 
 // Constants
 const BACKEND_URL = "https://shwast-fun-app.azurewebsites.net/api"
 const FIND_MOST_RELEVANT_SECTION = true
 const CURRENT_PAGE_HEADING = "CURRENT PAGE"
 
-
 // Global variables
 let history = []
-
 
 /* Initialise cache for text in scraped pages. 
 sessionStorage stores throughout a browser session whereas 
@@ -25,6 +24,12 @@ Pages are represented by an object {
 Note this could be made more efficient in the future*/
 sessionStorage["scrapedPages"] = sessionStorage["scrapedPages"] || "{}"
 
+let mediaRecorder
+let chunks = []
+let showAudioControls = false
+let useTTS = false
+
+// Callbacks
 document
 	.getElementById("search-button")
 	.addEventListener("click", async (event) => {
@@ -44,6 +49,17 @@ document
 			outputElement.innerHTML =
 				"Unknown error occured. Please try again later."
 		}
+
+		if (useTTS) {
+			console.log("Using TTS...")
+			const ttsAudio = await callTTSBackend(
+				outputElement.innerHTML.split("<br>")[0]
+			)
+			document.getElementById("audio-player").style.display = "block"
+			document.getElementById(
+				"audio-player"
+			).src = `data:audio/mp3;base64,${ttsAudio}`
+		}
 	})
 
 document
@@ -55,22 +71,52 @@ document
 		}
 	})
 
+document
+	.getElementById("show-audio-controls-button")
+	.addEventListener("click", (event) => {
+		if (!showAudioControls){
+			showAudioControls = true
+			useTTS = true //eventually add separate button to use TTS
+			document.getElementById("mic-button").style.display = "block"
+		} else {
+			showAudioControls = false
+			useTTS = false
+			document.getElementById("mic-button").style.display = "none"
+			document.getElementById("audio-player").style.display = "none"
+		}
+	})
+
+document.getElementById("mic-button").addEventListener("click", () => {
+	if (!mediaRecorder) {
+		startRecording()
+		document.getElementById("mic-button").textContent = "Stop"
+	} else {
+		mediaRecorder.stop()
+		document.getElementById("mic-button").textContent = "Record"
+	}
+})
+
 async function handleSearch(query) {
 	// Don't persist the following as this is very fast
-
 	let relevantPageRawHtml = getCurrentPageRawHtml()
 	const scrapedHeadings = scrapeHeadings(relevantPageRawHtml)
-	
+
 	// This is only used for context for select relevant section, and is not cached.
-	// However if this requires some slow NLP in future, this will require read/write 
+	// However if this requires some slow NLP in future, this will require read/write
 	// to cache hopefully using the same cache as below
-	const currentPagePrettyText =  parseGovTextFromHtml(relevantPageRawHtml) 
+	const currentPagePrettyText = parseGovTextFromHtml(relevantPageRawHtml)
 
 	const mostRelevantHeading = FIND_MOST_RELEVANT_SECTION
-		? await callSelectRelevantSectionBackend(query, scrapedHeadings, currentPagePrettyText)
+		? await callSelectRelevantSectionBackend(
+				query,
+				scrapedHeadings,
+				currentPagePrettyText
+		  )
 		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
-	let mostRelevantPage = JSON.parse(sessionStorage["scrapedPages"])[window.location.href]?.[mostRelevantHeading.url]
+	let mostRelevantPage = JSON.parse(sessionStorage["scrapedPages"])[
+		window.location.href
+	]?.[mostRelevantHeading.url]
 
 	if (!mostRelevantPage) {
 		console.log(`Scraping ${mostRelevantHeading.heading}...`)
@@ -81,13 +127,14 @@ async function handleSearch(query) {
 				: await getExternalPageRawHtml(mostRelevantHeading.url)
 
 		mostRelevantPage = {
-				prettyText: parseGovTextFromHtml(relevantPageRawHtml),
-				summary: "",
-			}
-		
+			prettyText: parseGovTextFromHtml(relevantPageRawHtml),
+			summary: "",
+		}
+
 		const storage = JSON.parse(sessionStorage["scrapedPages"])
 		storage[window.location.href] ||= {}
-		storage[window.location.href][mostRelevantHeading.url] = mostRelevantPage
+		storage[window.location.href][mostRelevantHeading.url] =
+			mostRelevantPage
 
 		sessionStorage["scrapedPages"] = JSON.stringify(storage)
 	}
@@ -140,7 +187,7 @@ function scrapeHeadings(rawHtml) {
 		.reduce(
 			(acc, x) => ({
 				...acc,
-				[x[1].trim()]: x.length < 3 ? "" : x[2].replace(/[\[\]]/g, "")
+				[x[1].trim()]: x.length < 3 ? "" : x[2].replace(/[\[\]]/g, ""),
 			}),
 			{}
 		)
@@ -194,7 +241,7 @@ async function callQueryBackend(context, query) {
 	return output
 }
 
-async function callSelectRelevantSectionBackend(query, headings, context="") {
+async function callSelectRelevantSectionBackend(query, headings, context = "") {
 	const response = await fetch(`${BACKEND_URL}/select-relevant-section`, {
 		method: "post",
 		headers: {
@@ -203,7 +250,7 @@ async function callSelectRelevantSectionBackend(query, headings, context="") {
 		body: JSON.stringify({
 			options: Object.keys(headings),
 			query: query,
-			context: context
+			context: context,
 		}),
 	})
 	const responseJson = await response.json()
@@ -217,4 +264,80 @@ async function callSelectRelevantSectionBackend(query, headings, context="") {
 	console.log(`Headings: ${Object.keys(headings)}`)
 	console.log(`Output: ${output.heading}`)
 	return output
+}
+
+async function callTTSBackend(text) {
+	const response = await fetch(`${BACKEND_URL}/text-to-speech`, {
+		method: "post",
+		headers: {
+			"Content-type": "application/json",
+		},
+		body: JSON.stringify({
+			text: text,
+		}),
+	})
+	const responseJson = await response.json()
+	const output = responseJson["output"]
+
+	return output
+}
+
+async function callSTTBackend(audio) {
+	const formData = new FormData()
+	formData.append("file", audio, "recording.wav")
+	const response = await fetch(`${BACKEND_URL}/speech-to-text`, {
+		method: "post",
+		body: formData,
+	})
+	const responseJson = await response.json()
+	const output = responseJson["output"]
+
+	return output
+}
+
+function startRecording() {
+	navigator.mediaDevices
+		.getUserMedia({ audio: true })
+		.then((stream) => {
+			mediaRecorder = new MediaRecorder(stream)
+
+			mediaRecorder.addEventListener("dataavailable", (event) => {
+				chunks.push(event.data)
+			})
+
+			mediaRecorder.addEventListener("stop", async () => {
+				const audioBlob = new Blob(chunks, { type: "audio/webm" })
+
+				const arrayBuffer = await audioBlob.arrayBuffer()
+				const audioContext = new AudioContext()
+				const audioBuffer = await audioContext.decodeAudioData(
+					arrayBuffer
+				)
+				const wavBuffer = toWav(audioBuffer)
+				const wavBlob = new Blob([new DataView(wavBuffer)], {
+					type: "audio/wav",
+				})
+
+				document.body.appendChild(
+					Object.assign(document.createElement("a"), {
+						href: URL.createObjectURL(wavBlob),
+						download: "test.wav",
+						innerHTML: "Click here to download",
+					})
+				)
+
+				const transcription = await callSTTBackend(wavBlob)
+				console.log(`Transcribed text: ${transcription}`)
+				document.getElementById("user-query").value = transcription
+				document.getElementById("search-button").click()
+
+				chunks = []
+				mediaRecorder = null
+			})
+
+			mediaRecorder.start()
+		})
+		.catch((error) => {
+			console.error("Error accessing microphone:", error)
+		})
 }
