@@ -251,6 +251,7 @@ async function callSelectRelevantSectionBackend(query, headings, context = "") {
 			options: Object.keys(headings),
 			query: query,
 			context: context,
+			history: history
 		}),
 	})
 	const responseJson = await response.json()
