@@ -3,6 +3,9 @@ An intelligent search bar to improve accessibility on GOV.UK/NHS.UK pages using 
 
 Kainos OpenAI submission for SHWAST (Beenita Shah, Oliver Stanley, Andrew Wang).
 
+- [**GOV.UK demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html)
+- [**NHS.UK demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html)
+
 ### Motivation
 
 > The future of accessibility for government messaging
@@ -31,7 +34,9 @@ Our solution will provide the following functionality:
 
 ## 1. Live demo
 
-A demo of the component in action on a sample GOV.UK website can be viewed [live here](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html) and on a NHS.UK website [live here](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html).
+You can view a demo of the component in action on a sample government website here:
+- Sample GOV.UK website [**demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html)
+- Sample NHS.UK website [**demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html)
 
 ## 2. Usage
 
