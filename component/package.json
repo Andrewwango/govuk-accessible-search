@@ -6,6 +6,7 @@
   "author": "Andrew Wang",
   "license": "MIT",
   "dependencies": {
+    "audiobuffer-to-wav": "^1.0.0",
     "govuk-frontend": "^4.6.0",
     "html-to-text": "^9.0.5",
     "live-server": "1.2.1",
