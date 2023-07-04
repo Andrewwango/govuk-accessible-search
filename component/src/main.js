@@ -50,15 +50,8 @@ document
 				"Unknown error occured. Please try again later."
 		}
 
-		if (useTTS) {
-			console.log("Using TTS...")
-			const ttsAudio = await callTTSBackend(
-				outputElement.innerHTML.split("<br>")[0]
-			)
-			document.getElementById("audio-player").style.display = "block"
-			document.getElementById(
-				"audio-player"
-			).src = `data:audio/mp3;base64,${ttsAudio}`
+		if (useTTS){
+			await speakSearchResult()
 		}
 	})
 
@@ -73,14 +66,17 @@ document
 
 document
 	.getElementById("show-audio-controls-button")
-	.addEventListener("click", (event) => {
+	.addEventListener("click", async (event) => {
 		if (!showAudioControls){
 			showAudioControls = true
 			useTTS = true //eventually add separate button to use TTS
+			document.getElementById("show-audio-controls-button").textContent = "Hide audio"
+			await speakSearchResult()
 			document.getElementById("mic-button").style.display = "block"
 		} else {
 			showAudioControls = false
 			useTTS = false
+			document.getElementById("show-audio-controls-button").textContent = "Show audio"
 			document.getElementById("mic-button").style.display = "none"
 			document.getElementById("audio-player").style.display = "none"
 		}
@@ -268,6 +264,7 @@ async function callSelectRelevantSectionBackend(query, headings, context = "") {
 }
 
 async function callTTSBackend(text) {
+	console.log("Calling TTS...")
 	const response = await fetch(`${BACKEND_URL}/text-to-speech`, {
 		method: "post",
 		headers: {
@@ -284,6 +281,7 @@ async function callTTSBackend(text) {
 }
 
 async function callSTTBackend(audio) {
+	console.log("Calling STT...")
 	const formData = new FormData()
 	formData.append("file", audio, "recording.wav")
 	const response = await fetch(`${BACKEND_URL}/speech-to-text`, {
@@ -294,6 +292,17 @@ async function callSTTBackend(audio) {
 	const output = responseJson["output"]
 
 	return output
+}
+
+async function speakSearchResult(){
+	const textToSpeak = document.getElementById("search-result").innerHTML.split("<br>")[0]
+	if (textToSpeak != "") {
+		const ttsAudio = await callTTSBackend(textToSpeak)
+		document.getElementById("audio-player").style.display = "block"
+		document.getElementById(
+			"audio-player"
+		).src = `data:audio/mp3;base64,${ttsAudio}`
+	}
 }
 
 function startRecording() {
