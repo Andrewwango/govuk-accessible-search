@@ -108,6 +108,8 @@ func azure functionapp publish shwast-fun-app
 
 (if using a different function app, replace `shwast-fun-app` with the new name)
 
+You must also ensure `shwast-fun-app` resource is configured with the environment variables required (see `local.settings.json.example`).
+
 ### 3.6 Test backend
 
 Use the text client.

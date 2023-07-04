@@ -8,6 +8,7 @@ const FIND_MOST_RELEVANT_SECTION = true
 const CURRENT_PAGE_HEADING = "CURRENT PAGE"
 
 // Global variables
+let history = []
 
 /* Initialise cache for text in scraped pages. 
 sessionStorage stores throughout a browser session whereas 
@@ -140,6 +141,18 @@ async function handleSearch(query) {
 
 	const answer = await callQueryBackend(mostRelevantPage.prettyText, query)
 
+	var query_dict = {}
+	query_dict.role = "user"
+	query_dict.content = query
+	
+	var answer_dict = {}
+	answer_dict.role = "assistant"
+	answer_dict.content = answer
+
+
+	history.push(query_dict)
+	history.push(answer_dict)
+	
 	return formatSearchResult(answer, mostRelevantHeading)
 }
 
@@ -215,6 +228,7 @@ async function callQueryBackend(context, query) {
 		body: JSON.stringify({
 			context: context,
 			query: query,
+			history: history
 		}),
 	})
 
@@ -222,6 +236,7 @@ async function callQueryBackend(context, query) {
 	const output = responseJson["output"]
 	console.log(`Query: ${query}`)
 	console.log(`Context: ${context}`)
+	console.log(`History: ${history}`)
 	console.log(`Output: ${output}`)
 	return output
 }
