@@ -251,6 +251,7 @@ async function callSelectRelevantSectionBackend(query, headings, context = "") {
 			options: Object.keys(headings),
 			query: query,
 			context: context,
+			history: history
 		}),
 	})
 	const responseJson = await response.json()
@@ -260,7 +261,9 @@ async function callSelectRelevantSectionBackend(query, headings, context = "") {
 		? { heading: heading, url: headings[heading] }
 		: { heading: CURRENT_PAGE_HEADING, url: "" }
 
-	console.log(`Query: ${query}`)
+	
+	
+		console.log(`Query: ${query}`)
 	console.log(`Headings: ${Object.keys(headings)}`)
 	console.log(`Output: ${output.heading}`)
 	return output
