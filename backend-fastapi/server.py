@@ -5,14 +5,13 @@ if __name__ == "__main__":
 import asyncio
 from collections import defaultdict
 from datetime import datetime, timedelta
-import json
 from typing import Annotated
 
 import fastapi
 from fastapi.responses import StreamingResponse
 import uvicorn
 
-from accessible_search import preprocessing, prompts, protocol, services
+from accessible_search import handlers, protocol, services
 
 app = fastapi.FastAPI()
 
@@ -46,48 +45,19 @@ async def rate_limit_middleware(request: fastapi.Request, call_next):
 
 @app.post("/api/chatgpt", response_model=protocol.TextOutputResponse)
 async def query_chatgpt(parameters: protocol.ChatGPTRequest):
-    history = preprocessing.preprocess_history(parameters.history)
-    query = preprocessing.preprocess_query(parameters.query)
-    context = preprocessing.preprocess_context(parameters.context)
-
-    prompt = prompts.construct_query_prompt(context, query)
-
-    response_dict = await services.perform_chat_completion_async(history, prompt, temperature=parameters.temperature)
-
+    response_dict = await handlers.handle_query_chatgpt_async(parameters)
     return protocol.TextOutputResponse(**response_dict)
 
 
 @app.post("/api/chatgpt-stream")
 async def query_chatgpt_stream(parameters: protocol.ChatGPTRequest):
-    history = preprocessing.preprocess_history(parameters.history)
-    query = preprocessing.preprocess_query(parameters.query)
-    context = preprocessing.preprocess_context(parameters.context)
-
-    prompt = prompts.construct_query_prompt(context, query)
-
-    async def event_stream():
-        response_generator = services.perform_chat_completion_streaming(
-            history, prompt, temperature=parameters.temperature
-        )
-
-        async for result in response_generator:
-            yield {
-                "data": json.dumps(result) + "\n"
-            }
-
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+    event_stream = handlers.handle_query_chatgpt_stream(parameters)
+    return StreamingResponse(event_stream, media_type="text/event-stream")
 
 
 @app.post("/api/select-relevant-section")
 async def select_relevant_section(parameters: protocol.SelectRelevantSectionRequest):
-    history = preprocessing.preprocess_history(parameters.history)
-    query = preprocessing.preprocess_query(parameters.query)
-    context = preprocessing.preprocess_context(parameters.context)
-
-    prompt = prompts.construct_select_prompt(parameters.options, context, query)
-
-    response_dict = await services.perform_chat_completion_async(history, prompt, max_tokens=16)
-
+    response_dict = await handlers.handle_select_relevant_section_async(parameters)
     return protocol.TextOutputResponse(**response_dict)
 
 

@@ -4,7 +4,7 @@ from typing import Callable
 
 import azure.functions as func
 
-from accessible_search import preprocessing, prompts, protocol, services
+from accessible_search import handlers, preprocessing, prompts, protocol, services
 from backend_function.exceptions import HTTPException
 
 
