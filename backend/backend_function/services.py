@@ -90,6 +90,8 @@ def perform_text_to_speech(text: str, lang: str = "auto") -> dict:
     if lang == "auto":
         try:
             lang = perform_language_recognition(text)
+            if "_" in lang:
+                lang = lang.split("_")[0]
         except Exception:
             logging.warning("Exception when recognising language, defaulting to 'en'...")
             lang = "en"
