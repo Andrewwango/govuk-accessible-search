@@ -4,7 +4,7 @@ from typing import Callable
 
 import azure.functions as func
 
-from accessible_search import handlers, preprocessing, prompts, protocol, services
+from accessible_search import handlers, protocol, services
 from backend_function.exceptions import HTTPException
 
 
@@ -31,15 +31,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def action_query_chatgpt(request: func.HttpRequest) -> func.HttpResponse:
     parameters = protocol.ChatGPTRequest(**get_request_json(request))
-
-    history = preprocessing.preprocess_history(parameters.history)
-    query = preprocessing.preprocess_query(parameters.query)
-    context = preprocessing.preprocess_context(parameters.context)
-
-    prompt = prompts.construct_query_prompt(context, query)
-
-    response_dict = services.perform_chat_completion(history, prompt, temperature=parameters.temperature)
-
+    response_dict = handlers.handle_query_chatgpt(parameters)
     return build_json_response(response_dict)
 
 
@@ -49,15 +41,7 @@ def action_query_chatgpt_stream(request: func.HttpRequest) -> func.HttpResponse:
 
 def action_select_relevant_section(request: func.HttpRequest) -> func.HttpResponse:
     parameters = protocol.SelectRelevantSectionRequest(**get_request_json(request))
-
-    history = preprocessing.preprocess_history(parameters.history)
-    query = preprocessing.preprocess_query(parameters.query)
-    context = preprocessing.preprocess_context(parameters.context)
-
-    prompt = prompts.construct_select_prompt(parameters.options, context, query)
-
-    response_dict = services.perform_chat_completion(history, prompt, max_tokens=16)
-
+    response_dict = handlers.handle_select_relevant_section(parameters)
     return build_json_response(response_dict)
 
 
