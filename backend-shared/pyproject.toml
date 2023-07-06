@@ -3,7 +3,7 @@ name = "accessible_search"
 description = "Accessible Search Shared Backend Code"
 version = "1.0.0"
 authors = [
-    { name = "Kainos", email = "andrew.wang@kainos.com" }
+    { name = "Kainos", email = "beenita.shah@kainos.com" }
 ]
 dependencies = [
     "azure-cognitiveservices-speech",
