@@ -1,0 +1,15 @@
+[project]
+name = "accessible_search"
+description = "Accessible Search Shared Backend Code"
+version = "1.0.0"
+authors = [
+    { name = "Kainos", email = "beenita.shah@kainos.com" }
+]
+dependencies = [
+    "azure-cognitiveservices-speech",
+    "openai"
+]
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]

@@ -4,7 +4,7 @@ from typing import Callable
 
 import azure.functions as func
 
-from backend_function import preprocessing, prompts, services
+from accessible_search import handlers, protocol, services
 from backend_function.exceptions import HTTPException
 
 
@@ -13,6 +13,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     action_mapping: dict[str, Callable[[func.HttpRequest], func.HttpResponse]] = {
         "chatgpt": action_query_chatgpt,
+        "chatgpt-stream": action_query_chatgpt_stream,
         "select-relevant-section": action_select_relevant_section,
         "speech-to-text": action_speech_to_text,
         "text-to-speech": action_text_to_speech,
@@ -29,30 +30,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 def action_query_chatgpt(request: func.HttpRequest) -> func.HttpResponse:
-    parameters = get_request_json(request)
-
-    history = preprocessing.preprocess_history(parameters.get("history", []))
-    query = preprocessing.preprocess_query(parameters["query"])
-    context = preprocessing.preprocess_context(parameters["context"])
-
-    prompt = prompts.construct_query_prompt(context, query)
-
-    response_dict = services.perform_chat_completion(history, prompt, parameters)
-
+    parameters = protocol.ChatGPTRequest(**get_request_json(request))
+    response_dict = handlers.handle_query_chatgpt(parameters)
     return build_json_response(response_dict)
 
 
+def action_query_chatgpt_stream(request: func.HttpRequest) -> func.HttpResponse:
+    return func.HttpResponse("Streaming not implemented for Functions backend", status_code=501)
+
+
 def action_select_relevant_section(request: func.HttpRequest) -> func.HttpResponse:
-    parameters = get_request_json(request)
-
-    history = preprocessing.preprocess_history(parameters.get("history", []))
-    query = preprocessing.preprocess_query(parameters["query"])
-    context = preprocessing.preprocess_context(parameters.get("context", ""))
-
-    prompt = prompts.construct_select_prompt(parameters["options"], context, query)
-
-    response_dict = services.perform_chat_completion(history, prompt, parameters, max_tokens=16)
-
+    parameters = protocol.SelectRelevantSectionRequest(**get_request_json(request))
+    response_dict = handlers.handle_select_relevant_section(parameters)
     return build_json_response(response_dict)
 
 
@@ -64,14 +53,14 @@ def action_speech_to_text(request: func.HttpRequest) -> func.HttpResponse:
     with open(filename, "wb") as f:
         f.write(content)
 
-    response_dict = services.perform_speech_to_text(filename)
+    response_dict = services.perform_speech_to_text(filename=filename)
 
     return build_json_response(response_dict)
 
 
 def action_text_to_speech(request: func.HttpRequest) -> func.HttpResponse:
-    parameters = get_request_json(request)
-    response_dict = services.perform_text_to_speech(parameters["text"])
+    parameters = protocol.TextToSpeechRequest(**get_request_json(request))
+    response_dict = services.perform_text_to_speech(parameters.text)
     return build_json_response(response_dict)
 
 

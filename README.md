@@ -94,24 +94,37 @@ The component and demo frontends in this repo are configured to be remotely buil
 
 ### 3.5 Deploy backend
 
-#### 3.5.1 To Deploy Locally
+#### 3.5.1 To Deploy Locally as an Azure Function
 
-Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Probably also create a virtual environment.
+Create `local.settings.json` based on the provided `local.settings.json.example` in `backend/`. Then ensure you have a Python virtual environment with all requirements activated. This can be set up as follows:
 
-```
-cd backend
-pip install -r requirements.txt
-func start
-```
-
-#### 3.5.2 To Deploy to Azure
-
-```
-cd backend
-func azure functionapp publish shwast-fun-app
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r backend-functions/requirements.txt
 ```
 
-(if using a different function app, replace `shwast-fun-app` with the new name)
+Then run the local deployment script.
+
+```
+bash deploy-local.sh
+```
+
+Once finishes, the created `temp/` directory can be safely deleted.
+
+#### 3.5.2 To Deploy to Azure Functions
+
+```
+bash deploy-functions.sh
+```
+
+(if using a different function app, set `FUNCTION_APP` variable with the new name)
+
+#### 3.5.3 To Deploy to Azure Container Instance
+
+```
+bash deploy-container.sh
+```
 
 You must also ensure `shwast-fun-app` resource is configured with the environment variables required (see `local.settings.json.example`).
 

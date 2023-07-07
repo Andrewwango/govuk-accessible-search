@@ -1,6 +1,7 @@
 import base64
 import logging
 import os
+from typing import AsyncIterable
 
 from azure.ai.textanalytics import TextAnalyticsClient
 from azure.cognitiveservices import speech
@@ -21,7 +22,7 @@ AZURE_SPEECH_REGION = os.getenv("AZURE_SPEECH_REGION")
 AZURE_LANGUAGE_KEY = os.getenv("AZURE_LANGUAGE_KEY")
 AZURE_LANGUAGE_ENDPOINT = os.getenv("AZURE_LANGUAGE_ENDPOINT")
 
-LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.1"))
+LLM_DEFAULT_TEMPERATURE = float(os.getenv("LLM_DEFAULT_TEMPERATURE", "0.0"))
 
 available_voices: list[speech.VoiceInfo] = speech.SpeechSynthesizer(
     speech_config=speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION), audio_config=None
@@ -32,14 +33,16 @@ available_voices: list[speech.VoiceInfo] = speech.SpeechSynthesizer(
 speech_to_text_languages = ["en-GB", "de-DE", "es-ES", "fr-FR"]
 
 
-def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, **kwargs) -> dict[str, str]:
+def perform_chat_completion(
+    history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
+) -> dict[str, str]:
     messages = history + [{"role": "user", "content": prompt}]
 
     chat_completion = openai.ChatCompletion.create(
         deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
         model="gpt-3.5-turbo",
         messages=messages,
-        temperature=parameters.get("temperature", LLM_DEFAULT_TEMPERATURE),
+        temperature=temperature,
         **kwargs,
     )
 
@@ -50,10 +53,60 @@ def perform_chat_completion(history: list[dict], prompt: str, parameters: dict, 
     }
 
 
-def perform_speech_to_text(filename: str) -> dict:
+async def perform_chat_completion_async(
+    history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
+) -> dict[str, str]:
+    messages = history + [{"role": "user", "content": prompt}]
+
+    chat_completion = await openai.ChatCompletion.acreate(
+        deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=temperature,
+        **kwargs,
+    )
+
+    output = chat_completion.choices[0].message.content
+
+    return {
+        "output": output
+    }
+
+
+async def perform_chat_completion_streaming(
+    history: list[dict], prompt: str, temperature: float = LLM_DEFAULT_TEMPERATURE, **kwargs
+) -> AsyncIterable[dict[str, str]]:
+    messages = history + [{"role": "user", "content": prompt}]
+
+    chat_completion = await openai.ChatCompletion.acreate(
+        deployment_id=OPENAI_CHATGPT_DEPLOYMENT,
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=temperature,
+        stream=True,
+        **kwargs,
+    )
+
+    async for chunk in chat_completion:
+        yield {
+            "output": chunk["choices"][0]["delta"]
+        }
+
+
+def perform_speech_to_text(filename: str = None, content: bytes = None) -> dict:
     speech_config = speech.SpeechConfig(subscription=AZURE_SPEECH_KEY, region=AZURE_SPEECH_REGION)
     speech_config.speech_recognition_language = "en-US"
-    audio_config = speech.audio.AudioConfig(filename=filename)
+
+    if filename:
+        audio_config = speech.audio.AudioConfig(filename=filename)
+    elif content:
+        # TODO: is this right? who knows
+        stream = speech.audio.PushAudioInputStream()
+        stream.write(content)
+        audio_config = speech.audio.AudioConfig(stream=stream)
+    else:
+        raise ValueError("Must provide filename or content")
+
     detect_lang_config = speech.languageconfig.AutoDetectSourceLanguageConfig(languages=speech_to_text_languages)
 
     recognizer = speech.SpeechRecognizer(
