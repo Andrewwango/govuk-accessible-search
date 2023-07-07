@@ -6,6 +6,8 @@ Kainos OpenAI submission for SHWAST (Beenita Shah, Oliver Stanley, Andrew Wang).
 - [**GOV.UK demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html)
 - [**NHS.UK demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-vaccination/index.html)
 
+**Note**: The current backend for the demo is deployed to Azure Functions on the free tier and as such is not always reliable - this could be mitigated by upgrading the plan in the future.
+
 ### Motivation
 
 > The future of accessibility for government messaging
