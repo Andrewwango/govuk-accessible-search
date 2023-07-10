@@ -28,6 +28,7 @@ let mediaRecorder
 let chunks = []
 let showAudioControls = false
 let useTTS = false
+let finished = false
 
 // Callbacks
 document
@@ -43,14 +44,23 @@ document
 
 		try {
 			outputElement.innerHTML = "Thinking..."
+			searchDone = false
+			setTimeout(() => {
+				if (!searchDone) {
+					outputElement.innerHTML =
+						"Sorry, we are unable to process your request. Please try again later."
+				}
+			}, 15000)
+
 			outputElement.innerHTML = await handleSearch(inputElement.value)
+			searchDone = true
 		} catch (err) {
 			console.log(err)
 			outputElement.innerHTML =
 				"Unknown error occured. Please try again later."
 		}
 
-		if (useTTS){
+		if (useTTS) {
 			await speakSearchResult()
 		}
 	})
@@ -67,16 +77,18 @@ document
 document
 	.getElementById("show-audio-controls-button")
 	.addEventListener("click", async (event) => {
-		if (!showAudioControls){
+		if (!showAudioControls) {
 			showAudioControls = true
 			useTTS = true //eventually add separate button to use TTS
-			document.getElementById("show-audio-controls-button").textContent = "Hide audio"
+			document.getElementById("show-audio-controls-button").textContent =
+				"Hide audio"
 			await speakSearchResult()
 			document.getElementById("mic-button").style.display = "block"
 		} else {
 			showAudioControls = false
 			useTTS = false
-			document.getElementById("show-audio-controls-button").textContent = "Show audio"
+			document.getElementById("show-audio-controls-button").textContent =
+				"Show audio"
 			document.getElementById("mic-button").style.display = "none"
 			document.getElementById("audio-player").style.display = "none"
 		}
@@ -140,15 +152,14 @@ async function handleSearch(query) {
 	var query_dict = {}
 	query_dict.role = "user"
 	query_dict.content = query
-	
+
 	var answer_dict = {}
 	answer_dict.role = "assistant"
 	answer_dict.content = answer
 
-
 	history.push(query_dict)
 	history.push(answer_dict)
-	
+
 	return formatSearchResult(answer, mostRelevantHeading)
 }
 
@@ -224,7 +235,7 @@ async function callQueryBackend(context, query) {
 		body: JSON.stringify({
 			context: context,
 			query: query,
-			history: history
+			history: history,
 		}),
 	})
 
@@ -247,7 +258,7 @@ async function callSelectRelevantSectionBackend(query, headings, context = "") {
 			options: Object.keys(headings),
 			query: query,
 			context: context,
-			history: history
+			history: history,
 		}),
 	})
 	const responseJson = await response.json()
@@ -294,8 +305,10 @@ async function callSTTBackend(audio) {
 	return output
 }
 
-async function speakSearchResult(){
-	const textToSpeak = document.getElementById("search-result").innerHTML.split("<br>")[0]
+async function speakSearchResult() {
+	const textToSpeak = document
+		.getElementById("search-result")
+		.innerHTML.split("<br>")[0]
 	if (textToSpeak != "") {
 		const ttsAudio = await callTTSBackend(textToSpeak)
 		document.getElementById("audio-player").style.display = "block"
