@@ -40,6 +40,8 @@ You can view a demo of the component in action on a sample government website he
 - Sample GOV.UK website [**demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.gov.uk/foreign-travel-advice/france/entry-requirements.html)
 - Sample NHS.UK website [**demo**](https://andrewwango.github.io/govuk-accessible-search/demo/dist/www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/index.html)
 
+If you get an error, make sure the backend is deployed and running, and the correct endpoint URL is referenced from the frontend.
+
 ## 2. Usage
 
 To use our component on your government webpage, simply [build the component locally](#31-build-component-locally), copy the component HTML file from `component/dist/index.html` and insert the component using a Nunjucks `include`:
@@ -92,9 +94,11 @@ Note: to use on a NHS webpage, instead include `component/index_nhs.html` which 
 
 ### 3.4 Deploy demo
 
-The component and demo frontends in this repo are configured to be remotely built and deployed to GitHub Pages for free. The remote build process simply follows the build instructions in Sections [3.1](#31-build-component-locally) and [3.2](#32-build-demo-locally).
+The component and demo frontends in this repo are configured to be remotely built and deployed to GitHub Pages for free. The build/deploy pipeline runs on a push to main. The remote build process simply follows the build instructions in Sections [3.1](#31-build-component-locally) and [3.2](#32-build-demo-locally).
 
 ### 3.5 Deploy backend
+
+After deploying the backend, make sure to put the endpoint URL in the component source `component/src/main.js` and push to main to redeploy.
 
 #### 3.5.1 To Deploy Locally as an Azure Function
 
